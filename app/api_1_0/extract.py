@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify, Response, url_for
-from ...vendors.api_extractor import RevisionExtractor
-from ...vendors.db_connector import RevisionDB
+from vendors.api_extractor import RevisionExtractor
+from vendors.db_connector import RevisionDB
+
 import urlparse
 from bson import json_util
 from . import api

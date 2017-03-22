@@ -1,16 +1,16 @@
 from __future__ import absolute_import, unicode_literals
-from . import celery
+from .. import celery
+import time
 
 # Get status using self
 @celery.task(bind=True)
 def hello(self):
 
-	for x in xrange(1,10):
-		print "Hello World!"
+	for x in xrange(1, 11):
+		print "Hello World! %d" % x
 		self.update_state(state='PROGRESS',
-                          meta={'current': x, 'total': 10,
-                                'status': "Hello World Step %d / 10!" % x})
-        time.sleep(1)
+						  meta={'status': "Hello World Step %d / 10!" % x})
+		time.sleep(2)
 
-	return {'current': 10, 'total': 10, 'status': 'Task completed!',
-            'result': "Hello World Step %d / 10"%x}
+	return {'status': 'Task completed!',
+			'result': "Hello World Step %d / 10" % x}

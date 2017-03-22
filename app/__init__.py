@@ -3,7 +3,7 @@ from flask import Flask
 from celery import Celery
 from config import config, Config
 
-celery = Celery(__name__, broker=Config.CELERY_BROKER_URL)
+celery = Celery(__name__, broker=Config.CELERY_BROKER_URL,include=[__name__+'.tasks'])
 
 def create_app(config_name):
     app = Flask(__name__)
@@ -20,6 +20,6 @@ def create_app(config_name):
     app.register_blueprint(main_blueprint)
 
     from .api_1_0 import api as api_1_0_blueprint
-    app.register_blueprint(api_1_0_blueprint, url_prefix='/api/v1/')
+    app.register_blueprint(api_1_0_blueprint, url_prefix='/api/v1')
 
     return app
