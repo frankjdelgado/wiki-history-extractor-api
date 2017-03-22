@@ -9,5 +9,6 @@
 
 ### Development
 
-* Start server ```./app.py```
-* Start Celery ```celery -A vendors worker --loglevel=info```
+* Start Server ```./run.sh server```
+* Start Celery ```./run.sh celery```
+* Install/Update Packages ```./run.sh update```
