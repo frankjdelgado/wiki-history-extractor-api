@@ -1,0 +1,3 @@
+pip install Flask-Script
+pip install Flask
+pip install celery
