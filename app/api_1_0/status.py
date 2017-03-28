@@ -10,7 +10,7 @@ def task_status(task_id):
 
     if name == "hello":
         task = hello.AsyncResult(task_id)
-    elif name == "extract"
+    elif name == "extract":
         task = extract.AsyncResult(task_id)
     
     if task.state == 'PENDING':
