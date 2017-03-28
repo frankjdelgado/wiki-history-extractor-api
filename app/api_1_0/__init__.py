@@ -2,4 +2,4 @@ from flask import Blueprint
 
 api = Blueprint('api', __name__)
 
-from . import docs, errors, views, status
+from . import docs, errors, views, status, revisions, extract

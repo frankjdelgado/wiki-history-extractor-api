@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify, Response, url_for
 import urlparse
 from bson import json_util
 from . import api
-from app.tasks.app_tasks import hello
+from app.tasks.app_tasks import hello, extract
 
 @api.route('/status/<task_id>')
 def task_status(task_id):
@@ -10,7 +10,9 @@ def task_status(task_id):
 
     if name == "hello":
         task = hello.AsyncResult(task_id)
-
+    elif name == "extract"
+        task = extract.AsyncResult(task_id)
+    
     if task.state == 'PENDING':
         # job did not start yet
         response = {
