@@ -1,9 +1,8 @@
 from flask import Flask, request, jsonify, Response, url_for
-from vendors.api_extractor import RevisionExtractor
-from vendors.db_connector import RevisionDB
 import urlparse
 from bson import json_util
 from . import api
+from .. import db
 
 @api.route('/revisions', methods=['GET'])
 def revisions():
@@ -12,7 +11,7 @@ def revisions():
     except ValueError:
         page = 1
 
-    revisions = RevisionDB.paginate(page)
+    revisions = db.paginate(page)
     return Response(
         json_util.dumps(revisions),
         mimetype='application/json'
