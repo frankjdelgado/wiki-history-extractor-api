@@ -1,11 +1,9 @@
 import requests
 import time
-from db_connector import RevisionDB
-
 
 class RevisionExtractor(object):
 
-    def __init__(self, payload={}, url='https://en.wikipedia.org/w/api.php', wait_time=2):
+    def __init__(self, payload={}, url='https://en.wikipedia.org/w/api.php', wait_time=2, db=None):
         self.payload = {
             'action': 'query',
             'format': 'json',
@@ -17,34 +15,38 @@ class RevisionExtractor(object):
 
         self.url = url
         self.wait_time = wait_time
+        self.db = db
+        
+        # Get the last revision extracted allocated in the DB
+        self.revendid = self.find_last_revid()
+
 
     def get_all(self, celery_status=None):
 
         total_revisions = 0
 
-        # Get the last revision extracted allocated in the DB
-        revendid = self.find_last_revid()
-        if revendid != 0:
-            self.payload.update({'rvendid': revendid})
         batch = self.get_one()
+
+        if batch == False:
+            return total_revisions
 
         while ("continue" in batch):
             time.sleep(self.wait_time)
-            self.payload.update(
-                {'rvcontinue': batch["continue"]["rvcontinue"]})
+            self.payload.update({'rvcontinue': batch["continue"]["rvcontinue"]})
             batch = self.get_one()
 
             if celery_status != None:
+                if batch == False:
+                    return total_revisions
 
                 # Count revision extracted
-                ks = list(response["query"]["pages"])
-                revision_count = len(response["query"]["pages"][
-                                     ks[0]]["revisions"])
+                ks = list(batch["query"]["pages"])
+                revision_count = len(batch["query"]["pages"][ks[0]]["revisions"])
                 total_revisions += revision_count
 
                 # Update status
                 celery_status.update_state(state='PROGRESS', meta={
-                                           'status': "%d/%d revisions extracted" % (revision_count, total_revisions)})
+                                           'status': "%d revisions extracted" % (total_revisions)})
 
         return total_revisions
 
@@ -57,19 +59,21 @@ class RevisionExtractor(object):
                 # Get json key an use it to access the revisions
                 ks = list(response["query"]["pages"])
                 # save data to db
-                self.save(response["query"]["pages"][ks[0]]["revisions"])
+                if self.save(response["query"]["pages"][ks[0]]["revisions"]) == False:
+                    return False
+
                 return response
             else:
                 return r.raise_for_status()
 
     def save(self, revisions):
-        RevisionDB.insert(revisions)
+        return self.db.insert(revisions, self.revendid)
 
     def remove_all(self):
-        RevisionDB.remove()
+        self.db.remove()
 
     def find_last_revid(self):
-        revision = RevisionDB.find_last()
+        revision = self.db.find_last()
         if revision != None:
             revid = 0
             for rev in revision:

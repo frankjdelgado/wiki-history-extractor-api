@@ -13,17 +13,20 @@ class RevisionDB(object):
         if config == None:
             config = self.config
 
-        self.client = MongoClient(host=config['host'],port=config['port'])
+        self.client = MongoClient(host=config['host'],port=config['port'],connect=False)
 
         if self.client.wiki_history_extractor.authenticate(config['username'], config['password']) == True :
             self.db = self.client.wiki_history_extractor
 
-    def insert(self, revisions):
+    def insert(self, revisions, last_revision):
         #Insert only if it does not exists
         for revision in revisions:
             revision["formatted"] = False
             self.db.revisions.update({'revid': revision['revid']}, revision, upsert=True)
-            
+            #if revision['revid'] == last_revision:
+                #return False
+        return True
+
     #test method for inserting formatted timestamps
     def insert_date(self):
         self.db.revisions.insert({'id': 123,'user':'marvin','size':25980,'timestamp': datetime.datetime(2015,1,1,6,1,18)})

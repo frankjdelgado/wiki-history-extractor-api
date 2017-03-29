@@ -1,8 +1,9 @@
 from __future__ import absolute_import, unicode_literals
 from .. import celery
-import time
-from vendors.api_extractor import RevisionExtractor
+from config import config, Config
 from vendors.db_connector import RevisionDB
+from vendors.api_extractor import RevisionExtractor
+import time
 
 
 @celery.task(bind=True)
@@ -19,9 +20,11 @@ def hello(self):
 
 
 @celery.task(bind=True)
-def extract(self, title):
+def extract_article(self, title):
 
-    extractor = RevisionExtractor(payload={'titles': title})
+    db = RevisionDB(config={'host': Config.MONGO_HOST, 'port': Config.MONGO_PORT, 'username': Config.MONGO_USERNAME, 'password': Config.MONGO_PASSWORD})
+
+    extractor = RevisionExtractor(payload={'titles': title}, db=db)
     total = extractor.get_all(self)
 
     return {'status': 'Task completed!',
