@@ -19,6 +19,12 @@ class Config:
     CELERY_ENABLE_UTC = True
     CELERY_RESULT_EXPIRES = 3600
 
+    MONGO_HOST = 'localhost'
+    MONGO_PORT = 27017
+    MONGO_USERNAME = 'wiki'
+    MONGO_PASSWORD = 'wiki123'
+
+
     FLASKY_MAIL_SUBJECT_PREFIX = '[Flasky]'
     FLASKY_MAIL_SENDER = 'Flasky Admin <flasky@example.com>'
     FLASKY_ADMIN = os.environ.get('FLASKY_ADMIN')
