@@ -4,54 +4,55 @@ import datetime
 
 class RevisionDB(object):
     
-    # it is extracted the information of the database connection, located in the 'connection_data.json' file
-    with open('connection_data.json') as json_data:
-        data = json.load(json_data)
+    config = {'host': 'localhost', 'port': 27017, 'username': '', 'password': ''}
+    db = None
+    client = None
+    per_page = 20
 
-    host=data['host']
-    port=data['port']
-    username=data['username']
-    password=data['password']
-    client = MongoClient(host=host,port=port)
-    if client.wiki_history_extractor.authenticate(username, password, mechanism='SCRAM-SHA-1') == True :
-        db = client.wiki_history_extractor
+    def __init__(self, config=None):
+        if config == None:
+            config = self.config
 
-    @classmethod
-    def insert(cls, revisions):
+        self.client = MongoClient(host=config['host'],port=config['port'])
+
+        if self.client.wiki_history_extractor.authenticate(config['username'], config['password']) == True :
+            self.db = self.client.wiki_history_extractor
+
+    def insert(self, revisions):
         #Insert only if it does not exists
         for revision in revisions:
-            cls.db.revisions.update({'revid': revision['revid']}, revision, upsert=True)
+            revision["formatted"] = False
+            self.db.revisions.update({'revid': revision['revid']}, revision, upsert=True)
             
-    @classmethod
     #test method for inserting formatted timestamps
-    def insert_date(cls):
-        cls.db.revisions.insert({'id': 123,'user':'marvin','size':25980,'timestamp': datetime.datetime(2015,1,1,6,1,18)})
-        cls.db.revisions.insert({'id': 124,'user':'marvin','size':25980,'timestamp': datetime.datetime(2015,2,4,3,1,20)})
-        cls.db.revisions.insert({'id': 125,'user':'marvin','size':25980,'timestamp': datetime.datetime(2015,6,6,14,1,18)})
+    def insert_date(self):
+        self.db.revisions.insert({'id': 123,'user':'marvin','size':25980,'timestamp': datetime.datetime(2015,1,1,6,1,18)})
+        self.db.revisions.insert({'id': 124,'user':'marvin','size':25980,'timestamp': datetime.datetime(2015,2,4,3,1,20)})
+        self.db.revisions.insert({'id': 125,'user':'marvin','size':25980,'timestamp': datetime.datetime(2015,6,6,14,1,18)})
 
-    @classmethod
-    def find(cls):
-        revisions = cls.db.revisions.find()
+    def find(self):
+        revisions = self.db.revisions.find()
         return revisions
 
-    @classmethod
-    def find_query(cls,query):
-        revisions = cls.db.revisions.find({},query)
+    def find_query(self,query):
+        revisions = self.db.revisions.find({},query)
         return revisions
 
-    @classmethod
-    def count(cls,query):
-        revisions = cls.db.revisions.find(query).count()
+    def count(self,query):
+        revisions = self.db.revisions.find(query).count()
         return revisions
 
-    @classmethod
-    def find_last(cls):
-        cursor= cls.db.revisions.find({},{'revid':1 , '_id':0})
+    def find_last(self):
+        cursor= self.db.revisions.find({},{'revid':1 , '_id':0})
         cursor = cursor.sort('revid', -1).limit(1)
         return cursor
 
-    @classmethod
-    def remove(cls):
-        revisions = cls.db.revisions.remove({})
+    def remove(self):
+        revisions = self.db.revisions.remove({})
         return revisions
+
+    def paginate(self, page):
+        revisions = self.db.revisions.find().skip((page-1)*self.per_page).limit(self.per_page)
+        return revisions
+
 
