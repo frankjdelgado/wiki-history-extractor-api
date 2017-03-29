@@ -12,3 +12,12 @@
 * Start Server ```./run.sh server```
 * Start Celery ```./run.sh celery```
 * Install/Update Packages ```./run.sh update```
+* Create a mongo user.  Example:
+	* Using the terminal, type: ```mongo```
+	* Once inside the mongo shell enter the following:
+	
+		```use wiki_history_extractor```
+	
+		```db.createUser({user: "wiki",pwd: "wiki123",roles: [{ role: "readWrite", db: "wiki_history_extractor" }]})```
+	
+		```exit```
