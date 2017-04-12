@@ -21,3 +21,13 @@
 		```db.createUser({user: "wiki",pwd: "wiki123",roles: [{ role: "readWrite", db: "wiki_history_extractor" }]})```
 	
 		```exit```
+
+### Endpoints
+
+##### Extraction
+
+* URL: ```/api/v1/extract```
+* params:
+	* ```title```: Wikipedia article title
+* example:
+	* ```/api/v1/extract?title=Malazan Book of the Fallen```

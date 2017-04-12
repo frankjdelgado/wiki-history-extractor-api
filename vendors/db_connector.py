@@ -1,6 +1,6 @@
 from pymongo import MongoClient
 import json
-import datetime
+from datetime import datetime
 
 class RevisionDB(object):
     
@@ -18,10 +18,22 @@ class RevisionDB(object):
         if self.client.wiki_history_extractor.authenticate(config['username'], config['password']) == True :
             self.db = self.client.wiki_history_extractor
 
-    def insert(self, revisions, last_revision):
+    def db():
+        return self.db
+
+    def revisions(self):
+        return self.db.revisions
+
+    def articles(self):
+        return self.db.articles
+
+    def insert(self, revisions, last_revision, article):
         #Insert only if it does not exists
         for revision in revisions:
-            revision["formatted"] = False
+
+            #Format adata
+            revision = self.format_raw_revision(revision, article)
+
             self.db.revisions.update({'revid': revision['revid']}, revision, upsert=True)
             #if revision['revid'] == last_revision:
                 #return False
@@ -57,5 +69,16 @@ class RevisionDB(object):
     def paginate(self, page):
         revisions = self.db.revisions.find().skip((page-1)*self.per_page).limit(self.per_page)
         return revisions
+
+    def update(self, filter, new_data):
+        revisions = self.db.revisions.update(filter, new_data, upsert=False)
+        return revisions
+
+    def format_raw_revision(self, revision, article):
+        revision["timestamp"] = datetime.strptime(revision["timestamp"], '%Y-%m-%dT%H:%M:%SZ')
+        revision["extraction_date"] =  datetime.now()
+        revision["pageid"] = article["pageid"]
+        revision["title"] = article["title"]
+        return revision
 
 

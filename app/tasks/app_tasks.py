@@ -29,3 +29,14 @@ def extract_article(self, title):
 
     return {'status': 'Task completed!',
             'result': "%d revisions extracted" % total}
+
+@celery.task(bind=True)
+def clean_revisions(self, title):
+
+    db = RevisionDB(config={'host': Config.MONGO_HOST, 'port': Config.MONGO_PORT, 'username': Config.MONGO_USERNAME, 'password': Config.MONGO_PASSWORD})
+
+    db.find_query({formatted: False})
+
+    self.update_state(state='IN PROGRESS', meta={'status': "%d revisions extracted" % (2)})
+    return {'status': 'Task completed!',
+            'result': "%d revisions extracted" % total}
