@@ -12,6 +12,15 @@ run_celery(){
 	celery worker -A celery_worker.celery --loglevel=info
 }
 
+run_monitor(){
+	celery flower -A celery_worker.celery --loglevel=info
+}
+
+run_events(){
+	celery events -A celery_worker.celery --loglevel=info
+}
+
+
 do_nothing(){
 	echo "Invalid arguments..."
 }
@@ -27,6 +36,12 @@ case $1 in
 		;;
 	"celery")
 		run_celery
+		;;
+	"monitor")
+		run_monitor
+		;;
+	"events")
+		run_events
 		;;
 	*)
 		do_nothing
