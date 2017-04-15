@@ -69,7 +69,7 @@ pycurl==7.19.5.1
 pygobject==3.16.2
 pymongo==3.4.0
 pyserial==2.7
-python-apt==1.0.1+ubuntu0.1
+python-apt==1.0.1
 python-dateutil==2.6.0
 python-debian==0.1.27
 pytz==2014.10

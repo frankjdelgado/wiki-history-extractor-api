@@ -10,6 +10,7 @@ class RevisionExtractor(object):
             'prop': 'revisions',
             'rvlimit': '50',
             'rvprop': 'ids|flags|timestamp|user|flags|user|userid|size|sha1|contentmodel|comment|parsedcomment|content|tags',
+            'rvdir':'newer',
         }
         self.payload.update(payload)
 
@@ -17,11 +18,15 @@ class RevisionExtractor(object):
         self.wait_time = wait_time
         self.db = db
         
-        # Get the last revision extracted allocated in the DB
-        self.revendid = self.find_last_revid()
 
 
     def get_all(self, celery_status=None):
+
+        # Get the last revision extracted allocated in the DB
+        self.revendid = self.find_last_revid()
+
+        if revendid != 0:
+            self.payload.update({'rvstartid': revendid})
 
         total_revisions = 0
 
