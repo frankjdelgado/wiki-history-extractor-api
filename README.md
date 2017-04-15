@@ -3,9 +3,11 @@
 ### Requirements
 
 * Python 2.7.10
-* Mongo DB 3.2.12
-* Celery 4.0.2
+* Mongo DB 3.2.12 
 * RabbitMQ 3.5.4
+* PyMongo 3.4.0 ```sudo pip install 'pymongo==3.4.0'```
+* Flower 0.9.1 ```sudo pip install 'flower==0.9.1'```
+* Celery 4.0.2 ```sudo pip install 'celery==4.0.2'```
 
 ### Development
 
@@ -21,3 +23,19 @@
 		```db.createUser({user: "wiki",pwd: "wiki123",roles: [{ role: "readWrite", db: "wiki_history_extractor" }]})```
 	
 		```exit```
+
+### Endpoints
+
+##### Extraction
+
+* URL: ```/api/v1/extract```
+* params:
+	* ```title```: Wikipedia article title
+* example:
+	* ```/api/v1/extract?title=Malazan Book of the Fallen```
+
+### Monitoring
+
+* Start Monitor ```./run.sh monitor```
+* Start Console Monitor ```./run.sh events```
+
