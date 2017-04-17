@@ -16,7 +16,6 @@ def extract():
     elif request.args.get('title') != None:
         title = request.args.get('title')
     else:
-        print request.args.get('title')
         response = jsonify(
             {"message": "Unsupported wiki article title or url given"})
         response.status_code = 400
