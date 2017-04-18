@@ -39,3 +39,8 @@
 * Start Monitor ```./run.sh monitor```
 * Start Console Monitor ```./run.sh events```
 
+
+### Cronjobs
+
+* enter ``` sudo crontab -e```
+* add line: ```0 0 * * * (cd PATH/TO/PROJECT/ROOT/FOLDER/ && python -m app.cronjobs.revisit)```
