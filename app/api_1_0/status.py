@@ -1,11 +1,14 @@
 from flask import Flask, request, jsonify, Response, url_for
 import urlparse
 from bson import json_util
-from . import api
+from . import api,auto
 from app.tasks.app_tasks import hello, extract_article
 
+
 @api.route('/status/<task_id>')
+@auto.doc()
 def task_status(task_id):
+    '''Check the current state of a given task. The function receives the task id and return the state.'''
     name = request.args.get('name')
 
     if name == "hello":

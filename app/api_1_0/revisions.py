@@ -1,11 +1,13 @@
 from flask import Flask, request, jsonify, Response, url_for
 import urlparse
 from bson import json_util
-from . import api
+from . import api,auto
 from .. import db
 
 @api.route('/revisions', methods=['GET'])
+@auto.doc()
 def revisions():
+    '''The function returns the content of the revisions.'''
     try:
         page = int(request.args.get('page', 1))
     except ValueError:

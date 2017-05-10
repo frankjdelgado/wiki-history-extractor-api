@@ -3,11 +3,12 @@ from app.tasks.app_tasks import extract_article
 
 import urlparse
 from bson import json_util
-from . import api
+from . import api,auto
 
 @api.route('/extract', methods=['GET', 'POST'])
+@auto.doc()
 def extract():
-
+    '''Extract the revisions data from a wiki article. The function can receive the URL or the wiki title.'''
     if request.args.get('url') != None:
         url_parts = urlparse.urlparse(request.args.get('url'))
         path_parts = url_parts[2].rpartition('/')
