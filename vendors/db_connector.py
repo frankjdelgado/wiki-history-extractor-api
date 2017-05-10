@@ -4,14 +4,14 @@ from datetime import datetime
 
 class RevisionDB(object):
     
-    config = {'host': 'localhost', 'port': 27017, 'username': '', 'password': ''}
+    default_config = {'host': 'localhost', 'port': 27017, 'username': '', 'password': ''}
     db = None
     client = None
     per_page = 20
 
     def __init__(self, config=None):
         if config == None:
-            config = self.config
+            config = self.default_config
 
         self.client = MongoClient(host=config['host'],port=config['port'],connect=False)
 

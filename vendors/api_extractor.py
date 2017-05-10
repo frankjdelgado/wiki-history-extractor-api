@@ -1,5 +1,6 @@
 import requests
 import time
+from datetime import datetime
 
 class RevisionExtractor(object):
 
@@ -8,7 +9,7 @@ class RevisionExtractor(object):
             'action': 'query',
             'format': 'json',
             'prop': 'revisions',
-            'rvlimit': '50',
+            'rvlimit': '100',
             'rvprop': 'ids|flags|timestamp|user|userid|size|sha1|contentmodel|comment|parsedcomment|content|tags',
             'rvdir':'newer',
         }
@@ -34,11 +35,17 @@ class RevisionExtractor(object):
             # Next Key its the id of the wiki.
             # Get json key an use it to access the revisions
             data = list(response["query"]["pages"])
+            article = response["query"]["pages"][data[0]]
 
-            if self.db.db.articles.find({'pageid': response["query"]["pages"][data[0]]["pageid"]}).count(True) == 0:
+            if self.db.db.articles.find({'pageid': article["pageid"]}).count(True) == 0:
                 # save data to db
-                return self.db.db.articles.insert(response["query"]["pages"][data[0]])
 
+                article["last_extraction_date"] = datetime.now()
+                article["first_extraction_date"] = datetime.now()
+                return self.db.db.articles.insert(article)
+            else:
+                article["last_extraction_date"] = datetime.now()
+                self.db.db.articles.update({'pageid': article["pageid"]}, {"$set": article}, upsert=False)
         else:
             return r.raise_for_status()
 
