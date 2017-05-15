@@ -18,7 +18,7 @@ class RevisionExtractor(object):
         self.url = url
         self.wait_time = wait_time
         self.db = db
-        
+        self.revendid=0
 
 
     def get_article(self):
@@ -55,8 +55,8 @@ class RevisionExtractor(object):
         # Get the last revision extracted allocated in the DB
         self.revendid = self.find_last_revid()
 
-        if revendid != 0:
-            self.payload.update({'rvstartid': revendid})
+        if self.revendid != 0:
+            self.payload.update({'rvstartid': self.revendid})
 
         total_revisions = 0
 
@@ -66,6 +66,12 @@ class RevisionExtractor(object):
 
         if batch == False:
             return total_revisions
+        else:
+            # Count revisions extracted
+            ks = list(batch["query"]["pages"])
+            revision_count = len(batch["query"]["pages"][ks[0]]["revisions"])
+            total_revisions += revision_count
+            
 
         while ("continue" in batch):
             time.sleep(self.wait_time)
@@ -76,7 +82,7 @@ class RevisionExtractor(object):
                 if batch == False:
                     return total_revisions
 
-                # Count revision extracted
+                # Count revisions extracted
                 ks = list(batch["query"]["pages"])
                 revision_count = len(batch["query"]["pages"][ks[0]]["revisions"])
                 total_revisions += revision_count
