@@ -1,4 +1,5 @@
 # wiki-history-extractor-api
+API developed to get metrics of the history revisions of wiki articles.
 
 ### Requirements
 
