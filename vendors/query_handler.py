@@ -1,25 +1,29 @@
-from db_connector import RevisionDB
 import datetime
 from config import config, Config
 
 class QueryHandler(object):
+    
     data={}
+    
+    def __init__(self, db=None):
+        self.db = db
+
     #function which get the quantity of revisions
     #tested
-    @classmethod
+
     def filter_by_user(self,values):
         #values is a list composed by 1 value, the user name to filter by
         data={'user':values[0]}
         return data
     
-    @classmethod
+
     def filter_by_tag(self,values):
         #values is a list composed by 1 value, the tag to filter by
         #NOTE: if necesary, it can be added a functionality to filter by multiple tags with logical OR, AND, XOR, etc.
         data={'tags':values[0]}
         return data
 
-    @classmethod
+
     def filter_by_size(self,values):
         #values is a list composed by 2 values, the size to filter by, and the order of filtering
         # when the order is greater than 0, it will return the revisions which size are greater than the argument
@@ -33,7 +37,7 @@ class QueryHandler(object):
             data={'size':values[0] }
         return data
 
-    @classmethod
+
     def filter_by_date(self,values):
         date_format = '%Y-%m-%d'
         #values is a list composed by 1 or 2 values: 
@@ -71,7 +75,7 @@ class QueryHandler(object):
                     data={'timestamp': {'$lte':date} }
                     return data
 
-    @classmethod
+
     #the filter allows multiple filters, based on the attribute argument
     # 1111 - 0000 -> 1 on . 0 off
     # 1XXX apply user filter
@@ -108,14 +112,12 @@ class QueryHandler(object):
         else:
             return query
         
-    @classmethod
     def get_count(self,filter_by_attribute,values):
         data=self.filter_by(filter_by_attribute,values)
         if data!='':
-            revisiondb = RevisionDB(config={'host': Config.MONGO_HOST, 'port': Config.MONGO_PORT, 'username': Config.MONGO_USERNAME, 'password': Config.MONGO_PASSWORD})
-            return revisiondb.count(data)
+            return self.db.count(data)
 
-    @classmethod
+
     #1 for user,2 for tag, 3 for size
     #besides the values required to filter(eg: username for user filtering, size and order for size filtering), it requires 2 values, as with date filtering for 2 dates-interval
     def get_avg(self,filter_by_attribute,values):
@@ -136,16 +138,14 @@ class QueryHandler(object):
         date_f=datetime.datetime.strptime(values[len(values)-1],date_format)
         days=(date_f-date_i).days +1
         if data!='':
-            revisiondb = RevisionDB(config={'host': Config.MONGO_HOST, 'port': Config.MONGO_PORT, 'username': Config.MONGO_USERNAME, 'password': Config.MONGO_PASSWORD})
-            res= revisiondb.count(data)
+            res= self.db.count(data)
             return res/(days*1.0)
 
-    @classmethod
+
     #function that gets the mode(moda) for an attribute, for now it works with users, size and date, because tags are mostly empty
     #Besides, it supports filter values, to make detailed measures.
     def get_mode(self,attribute_mode,filter_by_attribute,values):
         data=''
-        revisiondb = RevisionDB(config={'host': Config.MONGO_HOST, 'port': Config.MONGO_PORT, 'username': Config.MONGO_USERNAME, 'password': Config.MONGO_PASSWORD})
         #it is made the match of the revision, filtering by attributes
         data=self.filter_by(filter_by_attribute,values)
         #then it is created the projection for the query
@@ -167,7 +167,7 @@ class QueryHandler(object):
             projection=''
         
         if projection!='':
-            revisions=revisiondb.find_query(data,projection)
+            revisions=self.db.find_query(data,projection)
             valueslist=[]
             repetitionslist=[]
             #after collect the projected revisions, it is checked which values appears most,
@@ -207,9 +207,9 @@ class QueryHandler(object):
             return mode
     
 
-    @classmethod
+#    @classmethod
     #test method for inserting formatted timestamps
-    def insert_dates(self):
-        RevisionDB.insert_date()
+#    def insert_dates(self):
+#        RevisionDB.insert_date()
         
 

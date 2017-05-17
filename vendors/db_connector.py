@@ -50,7 +50,7 @@ class RevisionDB(object):
         return revisions
 
     def find_query(self,filters,query):
-        if filters=='':
+        if filters=='' or filters==None:
             revisions = self.db.revisions.find({},query)
         else:
             revisions = self.db.revisions.find(filters,query)

@@ -2,6 +2,7 @@ from __future__ import absolute_import, unicode_literals
 from .. import celery
 from config import config, Config
 from vendors.db_connector import RevisionDB
+from vendors.query_handler import QueryHandler
 from vendors.api_extractor import RevisionExtractor
 import time
 
@@ -40,3 +41,37 @@ def clean_revisions(self, title):
     self.update_state(state='IN PROGRESS', meta={'status': "%d revisions extracted" % (2)})
     return {'status': 'Task completed!',
             'result': "%d revisions extracted" % total}
+            
+@celery.task(bind=True)
+def count_task(self,code,values):
+
+    db = RevisionDB(config={'host': Config.MONGO_HOST, 'port': Config.MONGO_PORT, 'username': Config.MONGO_USERNAME, 'password': Config.MONGO_PASSWORD})
+    #instantiate a new QueryHandler to get execute the corresponding function
+    handler = QueryHandler(db=db)
+    number = handler.get_count(code,values)
+
+    return {'status': 'Task completed!', 
+            'count': "%d" % number}
+
+@celery.task(bind=True)
+def avg_task(self,code,values):
+
+    db = RevisionDB(config={'host': Config.MONGO_HOST, 'port': Config.MONGO_PORT, 'username': Config.MONGO_USERNAME, 'password': Config.MONGO_PASSWORD})
+    #instantiate a new QueryHandler to get execute the corresponding function
+    handler = QueryHandler(db=db)
+    number = handler.get_avg(code,values)
+
+    return {'status': 'Task completed!', 
+            'avg': "%f" % number}
+
+@celery.task(bind=True)
+def mode_task(self,attribute,code,values):
+
+    db = RevisionDB(config={'host': Config.MONGO_HOST, 'port': Config.MONGO_PORT, 'username': Config.MONGO_USERNAME, 'password': Config.MONGO_PASSWORD})
+    #instantiate a new QueryHandler to get execute the corresponding function
+    handler = QueryHandler(db=db)
+    number = handler.get_mode(attribute,code,values)
+
+    return {'status': 'Task completed!', 
+    'result': "%s" % number}
+

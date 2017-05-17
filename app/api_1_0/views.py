@@ -5,8 +5,6 @@ from vendors.db_connector import RevisionDB
 from config import config, Config
 from bson.json_util import dumps
 
-apo={'docstring':'epale/vale'}
-
 @api.route('/hello', methods=['GET'])
 @auto.doc()
 def hello_test():
