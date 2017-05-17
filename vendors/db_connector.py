@@ -49,12 +49,19 @@ class RevisionDB(object):
         revisions = self.db.revisions.find()
         return revisions
 
-    def find_query(self,query):
-        revisions = self.db.revisions.find({},query)
+    def find_query(self,filters,query):
+        if filters=='':
+            revisions = self.db.revisions.find({},query)
+        else:
+            revisions = self.db.revisions.find(filters,query)
         return revisions
 
     def count(self,query):
         revisions = self.db.revisions.find(query).count()
+        return revisions
+
+    def filter_query(self,query):
+        revisions = self.db.revisions.find(query)
         return revisions
 
     def find_last(self):
