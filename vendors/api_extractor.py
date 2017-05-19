@@ -36,15 +36,16 @@ class RevisionExtractor(object):
             # Get json key an use it to access the revisions
             data = list(response["query"]["pages"])
             article = response["query"]["pages"][data[0]]
-
             if self.db.db.articles.find({'pageid': article["pageid"]}).count(True) == 0:
                 # save data to db
 
-                article["last_extraction_date"] = datetime.now()
                 article["first_extraction_date"] = datetime.now()
+                article["last_extraction_date"] = datetime.now()
+                article["last_revision_extracted"]= self.find_last_revid()
                 return self.db.db.articles.insert(article)
             else:
                 article["last_extraction_date"] = datetime.now()
+                article["last_revision_extracted"]= self.find_last_revid()
                 self.db.db.articles.update({'pageid': article["pageid"]}, {"$set": article}, upsert=False)
         else:
             return r.raise_for_status()
@@ -59,8 +60,6 @@ class RevisionExtractor(object):
             self.payload.update({'rvstartid': self.revendid})
 
         total_revisions = 0
-
-        self.get_article()
 
         batch = self.get_one()
 
@@ -90,7 +89,7 @@ class RevisionExtractor(object):
                 # Update status
                 celery_status.update_state(state='IN PROGRESS', meta={
                                            'status': "%d revisions extracted" % (total_revisions)})
-
+        self.get_article()
         return total_revisions
 
     def get_one(self):
