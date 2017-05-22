@@ -27,6 +27,13 @@ class RevisionDB(object):
     def articles(self):
         return self.db.articles
 
+    def find_articles(self,query):
+        if query==None:
+            articles = self.db.articles.find({})
+        else:
+            articles = self.db.articles.find(query)
+        return articles
+
     def insert(self, revisions, last_revision, article):
         #Insert only if it does not exists
         for revision in revisions:
@@ -64,8 +71,8 @@ class RevisionDB(object):
         revisions = self.db.revisions.find(query)
         return revisions
 
-    def find_last(self):
-        cursor= self.db.revisions.find({},{'revid':1 , '_id':0})
+    def find_last(self,pageid):
+        cursor= self.db.revisions.find({'pageid':pageid},{'revid':1 , '_id':0})
         cursor = cursor.sort('revid', -1).limit(1)
         return cursor
 

@@ -4,7 +4,7 @@ from datetime import datetime
 
 class RevisionExtractor(object):
 
-    def __init__(self, payload={}, url='https://en.wikipedia.org/w/api.php', wait_time=2, db=None):
+    def __init__(self, payload={}, url='https://en.wikipedia.org/w/api.php',title=None, wait_time=2, db=None):
         self.payload = {
             'action': 'query',
             'format': 'json',
@@ -14,12 +14,27 @@ class RevisionExtractor(object):
             'rvdir':'newer',
         }
         self.payload.update(payload)
-
         self.url = url
         self.wait_time = wait_time
         self.db = db
         self.revendid=0
+        self.pageid=self.get_pageid(title)
 
+    def get_pageid(self,title):
+        payload = {
+            'action': 'query',
+            'format': 'json',
+            'titles': title
+        }
+        r = requests.get(self.url, params=payload)
+        if r.status_code == requests.codes.ok:
+            response = r.json()
+
+            # Next Key its the id of the wiki.
+            # Get json key an use it to access the revisions
+            data = list(response["query"]["pages"])
+            pageid= response["query"]["pages"][data[0]]["pageid"]
+            return pageid
 
     def get_article(self):
         payload = {
@@ -27,7 +42,7 @@ class RevisionExtractor(object):
             'format': 'json',
             'titles': self.payload["titles"]
         }
-
+        
         r = requests.get(self.url, params=payload)
         if r.status_code == requests.codes.ok:
             response = r.json()
@@ -55,14 +70,14 @@ class RevisionExtractor(object):
 
         # Get the last revision extracted allocated in the DB
         self.revendid = self.find_last_revid()
-
+        
         if self.revendid != 0:
             self.payload.update({'rvstartid': self.revendid})
 
         total_revisions = 0
 
         batch = self.get_one()
-
+        
         if batch == False:
             return total_revisions
         else:
@@ -120,7 +135,7 @@ class RevisionExtractor(object):
         self.db.remove()
 
     def find_last_revid(self):
-        revision = self.db.find_last()
+        revision = self.db.find_last(self.pageid)
         if revision != None:
             revid = 0
             for rev in revision:

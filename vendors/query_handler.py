@@ -5,17 +5,20 @@ class QueryHandler(object):
     
     data={}
     
-    def __init__(self, db=None):
+    def __init__(self, pageid=None , db=None):
         self.db = db
 
     #function which get the quantity of revisions
     #tested
+    def filter_by_title(self,values):
+        #values is a list composed by 1 value, the user title of the article to filter by
+        data={'title':values[0]}
+        return data
 
     def filter_by_user(self,values):
         #values is a list composed by 1 value, the user name to filter by
         data={'user':values[0]}
         return data
-    
 
     def filter_by_tag(self,values):
         #values is a list composed by 1 value, the tag to filter by
@@ -76,18 +79,24 @@ class QueryHandler(object):
                     return data
 
 
-    #the filter allows multiple filters, based on the attribute argument
-    # 1111 - 0000 -> 1 on . 0 off
-    # 1XXX apply user filter
-    # X1XX apply tag filter
-    # XX1X apply size filter
-    # XXX1 apply date filter 
+    #the filter allows multiple filters, based on the attribute argument: 
+    # 11111 - 00000 -> 1 on . 0 off
+    # 1XXXX apply title filter
+    # X1XXX apply user filter
+    # XX1XX apply tag filter
+    # XXX1X apply size filter
+    # XXXX1 apply date filter 
     def filter_by(self,attribute,values):
         token=attribute
         query={}
         valueslist=values
         option=False
-        if token / 1000 == 1:
+        if token / 10000 == 1:
+            query.update(self.filter_by_title(valueslist))
+            del valueslist[0]
+            option=True
+        token= token % 10000 
+        if token / 1000 == 1:                                                                     
             query.update(self.filter_by_user(valueslist))
             del valueslist[0]
             option=True
@@ -122,16 +131,7 @@ class QueryHandler(object):
     #besides the values required to filter(eg: username for user filtering, size and order for size filtering), it requires 2 values, as with date filtering for 2 dates-interval
     def get_avg(self,filter_by_attribute,values):
         # the filter to set avg is converted in a code with date filtering included
-        code=2
-        if filter_by_attribute==1:
-            code=1001
-        elif filter_by_attribute==2:
-            code=101
-        elif filter_by_attribute==3:
-            code=11
-        else:
-            code=2
-        data=self.filter_by(code,values)
+        data=self.filter_by(filter_by_attribute,values)
         date_format = '%Y-%m-%d'
         #the dates are extracted and are calculated the number of days with the .days function (datetime.timedelta library)
         date_i=datetime.datetime.strptime(values[len(values)-2],date_format)
@@ -163,6 +163,9 @@ class QueryHandler(object):
         elif attribute_mode==4:
             projection.update({'timestamp':1})
             attribute='timestamp'
+        elif attribute_mode==5:
+            projection.update({'title':1})
+            attribute='title'
         else:
             projection=''
         

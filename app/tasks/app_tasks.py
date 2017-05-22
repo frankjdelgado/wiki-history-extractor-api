@@ -25,7 +25,7 @@ def extract_article(self, title):
 
     db = RevisionDB(config={'host': Config.MONGO_HOST, 'port': Config.MONGO_PORT, 'username': Config.MONGO_USERNAME, 'password': Config.MONGO_PASSWORD})
 
-    extractor = RevisionExtractor(payload={'titles': title}, db=db)
+    extractor = RevisionExtractor(payload={'titles': title},title=title, db=db)
     total = extractor.get_all(self)
 
     return {'status': 'Task completed!',

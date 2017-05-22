@@ -5,6 +5,7 @@ import urlparse
 from bson import json_util
 from . import api,auto
 
+
 @api.route('/extract', methods=['GET', 'POST'])
 @auto.doc()
 def extract():
@@ -24,3 +25,4 @@ def extract():
 
     task = extract_article.delay(title)
     return jsonify({'Location': url_for('.task_status',task_id=task.id, name='extract_article')}), 202
+
