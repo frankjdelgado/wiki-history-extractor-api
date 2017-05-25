@@ -3,7 +3,7 @@ import time
 from math import factorial, exp
 from config import config, Config
 from vendors.db_connector import RevisionDB
-from app.tasks.app_tasks import extract_article
+#from app.tasks.app_tasks import extract_article
 
 # Based on wikimetrics ucv formula
 # t0: last time the article was updated
@@ -20,14 +20,11 @@ def calculate_v1(t0):
 
 # TODO: get proper probability distribution to calculat if an article should be revisited
 def calculate_v2(k=1,mean=1):
-	result = poisson(k, mean)
-
-	if result > 0.5:
-		return True
-	else:
-		return False
-	
-	return true
+    result = poisson(k, mean)
+    if result > 0.5:
+        return True
+    else:
+        return False
 
 def poisson(k, mean):
 	# Formula: e**(-mean) * (mean**k / factorial(k))
@@ -103,6 +100,7 @@ def check_revisions(db):
 			{'$limit': per_page},
 		]
 		cursor = db.revisions().aggregate(pipeline=pipe)
+        last_rev= db.find_last_rev()
 		for document in cursor: 
 		 	
 		 	# Set revision date to YYYY-MM-DD 00:00:00
@@ -122,5 +120,5 @@ db = RevisionDB(config={'host': Config.MONGO_HOST, 'port': Config.MONGO_PORT, 'u
 
 # Run algorithm
 check_revisions(db)
-
+calculate_v2(1.5,1)
  

@@ -1,5 +1,6 @@
 import datetime
 from config import config, Config
+from itertools import chain
 
 class QueryHandler(object):
     
@@ -170,7 +171,16 @@ class QueryHandler(object):
             projection=''
         
         if projection!='':
-            revisions=self.db.find_query(data,projection)
+            #first, we calculate how many revisions will be extracted, to extract them in chunks of 1000
+            per_page=1000
+            n_revisions=self.db.count(data)
+            total=1+ n_revisions/per_page
+            revisions=[]
+            #now, the revisions are extracted in chunks, and saved in a cursor
+            for page in xrange(1, total+1):
+                aux=self.db.paginate_for_query(data,projection,page,per_page)
+                #the cursor is concatenated with the revisions cursor
+                revisions=[x for x in chain(revisions, aux)]
             valueslist=[]
             repetitionslist=[]
             #after collect the projected revisions, it is checked which values appears most,

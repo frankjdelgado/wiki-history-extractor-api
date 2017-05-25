@@ -33,6 +33,12 @@ class RevisionDB(object):
         else:
             articles = self.db.articles.find(query)
         return articles
+        
+    def last_revs(self):
+        cursor= self.db.articles.find({},{'last_extraction_date':1 ,'pageid':1, '_id':0})
+        cursor=list(cursor)
+        return cursor
+
 
     def insert(self, revisions, last_revision, article):
         #Insert only if it does not exists
@@ -82,6 +88,10 @@ class RevisionDB(object):
 
     def paginate(self, page):
         revisions = self.db.revisions.find().skip((page-1)*self.per_page).limit(self.per_page)
+        return revisions
+
+    def paginate_for_query(self, filters, projection,page, per_page):
+        revisions = self.db.revisions.find(filters,projection).skip((page-1)*per_page).limit(per_page)
         return revisions
 
     def update(self, filter, new_data):
