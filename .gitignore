@@ -17,3 +17,10 @@ htmlcov
 .coverage
 .coverage.*
 *,cover
+
+# Python Virtual Env
+bin/
+include/
+lib/
+local/
+pip-selfcheck.json
