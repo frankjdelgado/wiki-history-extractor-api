@@ -5,15 +5,17 @@ from vendors.db_connector import RevisionDB
 from config import config, Config
 from bson.json_util import dumps
 
+
+# Testing routes
 @api.route('/hello', methods=['GET'])
-@auto.doc()
+#@auto.doc()
 def hello_test():
 	'''Testing function'''
 	task = hello.apply_async()
 	return jsonify({'Location': url_for('.task_status',task_id=task.id, name='hello')}), 202
 
 @api.route('/test', methods=['GET'])
-@auto.doc()
+#@auto.doc()
 def test():
 	'''Testing function'''
 	db = RevisionDB(config={'host': Config.MONGO_HOST, 'port': Config.MONGO_PORT, 'username': Config.MONGO_USERNAME, 'password': Config.MONGO_PASSWORD})

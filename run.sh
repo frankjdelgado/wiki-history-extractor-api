@@ -1,7 +1,7 @@
 #!/bin/bash
 
 install_requirements(){
-	sudo pip install -r requirements.txt
+	pip install -r requirements.txt
 }
 
 run_server(){
