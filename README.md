@@ -15,9 +15,9 @@ API developed to get metrics of the history revisions of wiki articles.
 	* `pip install virtualenv`
 	* `cd wiki-history-extractor-api`
 	* `virtualenv .`
-	* Use `. bin/active` to be able activate the virtual environment in your current console window. For example:
+	* Use `. bin/activate` to be able activate the virtual environment in your current console window. For example:
 		* First window:
-			1. `. bin/active`
+			1. `. bin/activate`
 			2. `./run.sh update`
 			3. `./run.sh server`
 		* Second window:
