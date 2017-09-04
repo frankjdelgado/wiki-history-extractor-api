@@ -53,43 +53,33 @@ class ProductionConfig(Config):
     CELERY_BROKER_URL = 'amqp://wiki:wiki123@rabbit:5672'
     CELERY_RESULT_BACKEND = 'amqp://wiki:wiki123@rabbit:5672'
 
-class HerokuConfig(ProductionConfig):
-    SSL_DISABLE = bool(os.environ.get('SSL_DISABLE'))
+class DigitalOceanConfig(Config):
+    MONGO_HOST = 'mongo'
+    MONGO_PORT = 27017
+    MONGO_USERNAME = 'wiki'
+    MONGO_PASSWORD = 'wiki123'
+    SSL_DISABLE = True
 
-    @classmethod
-    def init_app(cls, app):
-        ProductionConfig.init_app(app)
+    CELERY_BROKER_URL = 'amqp://wiki:wiki123@rabbit:5672'
+    CELERY_RESULT_BACKEND = 'amqp://wiki:wiki123@rabbit:5672'
+    CELERY_TIMEZONE = 'America/New_York'
 
-        # handle proxy server headers
-        from werkzeug.contrib.fixers import ProxyFix
-        app.wsgi_app = ProxyFix(app.wsgi_app)
+class DockerConfig(Config):
+    MONGO_HOST = 'mongo'
+    MONGO_PORT = 27017
+    MONGO_USERNAME = 'wiki'
+    MONGO_PASSWORD = 'wiki123'
+    SSL_DISABLE = True
 
-        # log to stderr
-        import logging
-        from logging import StreamHandler
-        file_handler = StreamHandler()
-        file_handler.setLevel(logging.WARNING)
-        app.logger.addHandler(file_handler)
-
-
-class UnixConfig(ProductionConfig):
-    @classmethod
-    def init_app(cls, app):
-        ProductionConfig.init_app(app)
-
-        # log to syslog
-        import logging
-        from logging.handlers import SysLogHandler
-        syslog_handler = SysLogHandler()
-        syslog_handler.setLevel(logging.WARNING)
-        app.logger.addHandler(syslog_handler)
+    CELERY_BROKER_URL = 'amqp://wiki:wiki123@rabbit:5672'
+    CELERY_RESULT_BACKEND = 'amqp://wiki:wiki123@rabbit:5672'
 
 config = {
     'development': DevelopmentConfig,
     'testing': TestingConfig,
     'production': ProductionConfig,
-    'heroku': HerokuConfig,
-    'unix': UnixConfig,
+    'do': DigitalOceanConfig,
+    'docker': DockerConfig,
 
     'default': DevelopmentConfig
 }
