@@ -1,8 +1,11 @@
-FROM tiangolo/uwsgi-nginx-flask:python2.7
+FROM python:2.7-alpine
 
-COPY /environments/development/celery/celery.conf /etc/supervisor/conf.d/celery.conf
+RUN mkdir /app
 WORKDIR /app
+
 COPY requirements.txt requirements.txt
 RUN pip install -r requirements.txt
 
 COPY . .
+
+CMD python manage.py runserver --host 0.0.0.0 --port=80

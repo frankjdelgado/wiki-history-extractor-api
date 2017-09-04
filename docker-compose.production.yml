@@ -17,7 +17,7 @@ services:
           - 'wiki_rabbit:/data'
 
     mongo:
-        build: ./environments/light/mongo
+        build: ./environments/production/mongo
         restart: always
         environment:
             MONGO_ROLE: primary
@@ -31,6 +31,8 @@ services:
         stdin_open: true
         networks:
             - wiki_network
+        #volumes:
+        #    - 'wiki_mongo:/data/db'
 
     nginx:
         image: nginx:1.13.3
@@ -42,7 +44,7 @@ services:
         networks:
           - wiki_network
         volumes:
-            - './environments/light/nginx/nginx.conf:/etc/nginx/nginx.conf:ro'
+            - './environments/production/nginx/nginx.conf:/etc/nginx/nginx.conf:ro'
         environment:
             - FLASK_CONFIG=production
         depends_on:
@@ -53,8 +55,6 @@ services:
         restart: always
         environment:
             - FLASK_CONFIG=production
-            - PYTHONBUFFERED=true
-            - FLASK_DEBUG=1
         links:
             - rabbit
             - mongo:mongo
@@ -64,23 +64,6 @@ services:
           - wiki_network
         volumes:
           - '.:/app'
-        depends_on:
-            - rabbit
-            - mongo
-    
-    worker:
-        build: .
-        restart: always
-        command: celery worker -A celery_worker.celery --loglevel=info
-        environment:
-            - FLASK_CONFIG=production
-            - PYTHONBUFFERED=true
-            - FLASK_DEBUG=1
-        links:
-            - rabbit
-            - mongo:mongo
-        networks:
-          - wiki_network
         depends_on:
             - rabbit
             - mongo

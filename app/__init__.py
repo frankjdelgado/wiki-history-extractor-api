@@ -4,7 +4,9 @@ from celery import Celery
 from config import config, Config
 from vendors.db_connector import RevisionDB
 import os
-celery = Celery(__name__, backend=config[os.environ.get('FLASK_CONFIG')].CELERY_RESULT_BACKEND, broker=config[os.environ.get('FLASK_CONFIG')].CELERY_BROKER_URL,include=[__name__+'.tasks'])
+
+env_name = os.getenv('FLASK_CONFIG') or 'default'
+celery = Celery(__name__, backend=config[env_name].CELERY_RESULT_BACKEND, broker=config[env_name].CELERY_BROKER_URL,include=[__name__+'.tasks'])
 
 def create_app(config_name):
     app = Flask(__name__)

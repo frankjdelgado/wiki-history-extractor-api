@@ -3,6 +3,7 @@ import urlparse
 from bson import json_util
 from . import api,auto
 from vendors.db_connector import RevisionDB
+from config import config, Config
 
 @api.route('/revisions', methods=['GET'])
 @auto.doc()
