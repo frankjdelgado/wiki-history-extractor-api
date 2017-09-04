@@ -3,14 +3,14 @@ from flask import Flask
 from celery import Celery
 from config import config, Config
 from vendors.db_connector import RevisionDB
-
-celery = Celery(__name__, broker=Config.CELERY_BROKER_URL,include=[__name__+'.tasks'])
-db = RevisionDB(config={'host': Config.MONGO_HOST, 'port': Config.MONGO_PORT, 'username': Config.MONGO_USERNAME, 'password': Config.MONGO_PASSWORD})
+import os
+celery = Celery(__name__, backend=config[os.environ.get('FLASK_CONFIG')].CELERY_RESULT_BACKEND, broker=config[os.environ.get('FLASK_CONFIG')].CELERY_BROKER_URL,include=[__name__+'.tasks'])
 
 def create_app(config_name):
     app = Flask(__name__)
     app.config.from_object(config[config_name])
     config[config_name].init_app(app)
+    config['default'] = config[config_name]
 
     celery.conf.update(app.config)
 

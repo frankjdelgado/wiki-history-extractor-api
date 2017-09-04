@@ -1,2 +1,74 @@
-wiki-history-extractor:
-  image: api
+version: '3'
+
+services:
+
+    rabbit:
+        image: rabbitmq:3.6.11
+        restart: always
+        hostname: rabbit
+        environment:
+            - RABBITMQ_DEFAULT_USER=wiki
+            - RABBITMQ_DEFAULT_PASS=wiki123
+        ports:
+            - "5673:5672"
+        networks:
+          - wiki_network
+        volumes:
+          - 'wiki_rabbit:/data'
+
+    mongo:
+        build: ./environments/development/mongo
+        restart: always
+        environment:
+            MONGO_ROLE: primary
+            MONGO_ROOT_USER: wikiadmin
+            MONGO_ROOT_PASSWORD: wikiadmin123
+            MONGO_APP_USER: wiki
+            MONGO_APP_PASSWORD: wiki123
+            MONGO_APP_DATABASE: wiki_history_extractor
+        tty: true
+        hostname: mongo
+        stdin_open: true
+        networks:
+            - wiki_network
+        volumes:
+            - 'wiki_mongo:/data/db'
+
+    nginx:
+        image: nginx:1.13.3
+        restart: always
+        links:
+            - flask
+        ports:
+            - "88:80"
+        networks:
+          - wiki_network
+        volumes:
+            - './environments/development/nginx/nginx.conf:/etc/nginx/nginx.conf:ro'
+        environment:
+            - FLASK_CONFIG=production
+            
+    flask:
+        build: .
+        restart: always
+        environment:
+            - FLASK_CONFIG=production
+        links:
+            - rabbit
+            - mongo:mongo
+        ports:
+            - '80'
+        networks:
+          - wiki_network
+        volumes:
+          - '.:/app'
+        depends_on:
+            - rabbit
+            - mongo
+
+volumes:
+    wiki_rabbit:
+    wiki_mongo:
+
+networks:
+  wiki_network:

@@ -1,8 +1,6 @@
 .DS_Store
 *.pyc
 *.pyo
-env
-env*
 dist
 build
 *.egg
@@ -24,3 +22,4 @@ include/
 lib/
 local/
 pip-selfcheck.json
+.vscode
