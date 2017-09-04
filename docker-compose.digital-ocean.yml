@@ -16,21 +16,21 @@ services:
         volumes:
           - 'wiki_rabbit:/data'
 
-    mongo:
-        build: ./environments/light/mongo
-        restart: always
-        environment:
-            MONGO_ROLE: primary
-            MONGO_ROOT_USER: wikiadmin
-            MONGO_ROOT_PASSWORD: wikiadmin123
-            MONGO_APP_USER: wiki
-            MONGO_APP_PASSWORD: wiki123
-            MONGO_APP_DATABASE: wiki_history_extractor
-        tty: true
-        hostname: mongo
-        stdin_open: true
-        networks:
-            - wiki_network
+    # mongo:
+    #     build: ./environments/light/mongo
+    #     restart: always
+    #     environment:
+    #         MONGO_ROLE: primary
+    #         MONGO_ROOT_USER: wikiadmin
+    #         MONGO_ROOT_PASSWORD: wikiadmin123
+    #         MONGO_APP_USER: wiki
+    #         MONGO_APP_PASSWORD: wiki123
+    #         MONGO_APP_DATABASE: wiki_history_extractor
+    #     tty: true
+    #     hostname: mongo
+    #     stdin_open: true
+    #     networks:
+    #         - wiki_network
 
     nginx:
         image: nginx:1.13.3
@@ -55,7 +55,6 @@ services:
             - FLASK_DEBUG=1
         links:
             - rabbit
-            - mongo:mongo
         ports:
             - '80'
         networks:
@@ -64,7 +63,6 @@ services:
           - '.:/app'
         depends_on:
             - rabbit
-            - mongo
     
     worker:
         build: .
@@ -74,18 +72,19 @@ services:
             - FLASK_CONFIG=digital_ocean
             - PYTHONBUFFERED=true
             - FLASK_DEBUG=1
+            - MONGO_HOST = test
+            - MONGO_PORT = test
+            - MONGO_USERNAME = test
+            - MONGO_PASSWORD = test
         links:
             - rabbit
-            - mongo:mongo
         networks:
           - wiki_network
         depends_on:
             - rabbit
-            - mongo
 
 volumes:
     wiki_rabbit:
-    wiki_mongo:
 
 networks:
   wiki_network:
