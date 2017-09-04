@@ -18,7 +18,7 @@ def hello_test():
 #@auto.doc()
 def test():
 	'''Testing function'''
-	db = RevisionDB(config={'host': Config.MONGO_HOST, 'port': Config.MONGO_PORT, 'username': Config.MONGO_USERNAME, 'password': Config.MONGO_PASSWORD})
+	db = RevisionDB(config={'host': config['default'].MONGO_HOST, 'port': config['default'].MONGO_PORT, 'username': config['default'].MONGO_USERNAME, 'password': config['default'].MONGO_PASSWORD})
 
 	# Number of revisions to process
 	value = dumps(db.db.revisions.find({'_id': 1}))

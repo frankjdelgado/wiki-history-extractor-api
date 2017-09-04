@@ -5,12 +5,11 @@ from . import api,auto
 from vendors.db_connector import RevisionDB
 from config import config, Config
 
-
 @api.route('/articles', methods=['GET', 'POST'])
 @auto.doc()
 def articles_task():
     '''Return the list of articles in the database.'''
-    db = RevisionDB(config={'host': Config.MONGO_HOST, 'port': Config.MONGO_PORT, 'username': Config.MONGO_USERNAME, 'password': Config.MONGO_PASSWORD})
+    db = RevisionDB(config={'host': config['default'].MONGO_HOST, 'port': config['default'].MONGO_PORT, 'username': config['default'].MONGO_USERNAME, 'password': config['default'].MONGO_PASSWORD})
     arts=db.find_articles(None)
     #convert the collection of articles to a json response 
     return Response(
@@ -23,7 +22,7 @@ def articles_task():
 @auto.doc()
 def article_info(page_id):
     '''Return the information of the Article in the database with the given page_id.'''
-    db = RevisionDB(config={'host': Config.MONGO_HOST, 'port': Config.MONGO_PORT, 'username': Config.MONGO_USERNAME, 'password': Config.MONGO_PASSWORD})
+    db = RevisionDB(config={'host': config['default'].MONGO_HOST, 'port': config['default'].MONGO_PORT, 'username': config['default'].MONGO_USERNAME, 'password': config['default'].MONGO_PASSWORD})
     query={'pageid':int(page_id)}
     arts=db.find_articles(query)
     return Response(
