@@ -31,8 +31,8 @@ services:
         stdin_open: true
         networks:
             - wiki_network
-        volumes:
-            - 'wiki_mongo:/data/db'
+        #volumes:
+        #    - 'wiki_mongo:/data/db'
 
     nginx:
         image: nginx:1.13.3

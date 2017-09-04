@@ -60,7 +60,9 @@ API developed to get metrics of the history revisions of wiki articles.
 	* `sudo apt-get install docker-ce` 
 	* `sudo groupadd docker` 
 	* `sudo usermod -aG docker $USER`
-	* `sudo apt-get install docker-compose`
+	* `sudo -i`
+	* ```curl -L https://github.com/docker/compose/releases/download/1.16.1/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose```
+	
 * Run Servers
 	* `docker-compose build`
 	* `docker network create wikihistoryextractorapi_wiki_network`
