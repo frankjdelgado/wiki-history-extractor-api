@@ -78,7 +78,7 @@ config = {
     'development': DevelopmentConfig,
     'testing': TestingConfig,
     'production': ProductionConfig,
-    'do': DigitalOceanConfig,
+    'digital_ocean': DigitalOceanConfig,
     'docker': DockerConfig,
 
     'default': DevelopmentConfig
