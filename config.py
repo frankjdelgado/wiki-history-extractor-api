@@ -54,10 +54,10 @@ class ProductionConfig(Config):
     CELERY_RESULT_BACKEND = 'amqp://wiki:wiki123@rabbit:5672'
 
 class DigitalOceanConfig(Config):
-    MONGO_HOST = 'mongo'
-    MONGO_PORT = 27017
-    MONGO_USERNAME = 'wiki'
-    MONGO_PASSWORD = 'wiki123'
+    MONGO_HOST = os.environ.get('MONGO_HOST')
+    MONGO_PORT = int(os.environ.get('MONGO_PORT'))
+    MONGO_USERNAME = os.environ.get('MONGO_USERNAME')
+    MONGO_PASSWORD = os.environ.get('MONGO_PASSWORD')
     SSL_DISABLE = True
 
     CELERY_BROKER_URL = 'amqp://wiki:wiki123@rabbit:5672'

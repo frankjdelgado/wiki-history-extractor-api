@@ -13,7 +13,7 @@ class RevisionDB(object):
         if config == None:
             config = self.default_config
             
-        self.client = MongoClient(config['host'],config['port'],connect=False)
+        self.client = MongoClient(config['host'],int(config['port']),connect=False)
         
         if self.client.wiki_history_extractor.authenticate(config['username'], config['password']) == True :
             self.db = self.client.wiki_history_extractor
