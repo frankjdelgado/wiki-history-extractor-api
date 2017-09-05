@@ -53,6 +53,10 @@ services:
             - FLASK_CONFIG=digital_ocean
             - PYTHONBUFFERED=true
             - FLASK_DEBUG=1
+            - MONGO_HOST=test
+            - MONGO_PORT=test
+            - MONGO_USERNAME=test
+            - MONGO_PASSWORD=test
         links:
             - rabbit
         ports:
