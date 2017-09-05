@@ -53,10 +53,10 @@ services:
             - FLASK_CONFIG=digital_ocean
             - PYTHONBUFFERED=true
             - FLASK_DEBUG=1
-            - MONGO_HOST=test
-            - MONGO_PORT=test
-            - MONGO_USERNAME=test
-            - MONGO_PASSWORD=test
+            - MONGO_HOST=ds123124.mlab.com
+            - MONGO_PORT=23124
+            - MONGO_USERNAME=wiki
+            - MONGO_PASSWORD=wiki123
         links:
             - rabbit
         ports:
@@ -76,14 +76,16 @@ services:
             - FLASK_CONFIG=digital_ocean
             - PYTHONBUFFERED=true
             - FLASK_DEBUG=1
-            - MONGO_HOST = test
-            - MONGO_PORT = test
-            - MONGO_USERNAME = test
-            - MONGO_PASSWORD = test
+            - MONGO_HOST=ds123124.mlab.com
+            - MONGO_PORT=23124
+            - MONGO_USERNAME=wiki
+            - MONGO_PASSWORD=wiki123
         links:
             - rabbit
         networks:
           - wiki_network
+        volumes:
+          - '.:/app'
         depends_on:
             - rabbit
 
