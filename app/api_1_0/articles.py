@@ -10,7 +10,7 @@ from config import config, Config
 def articles_task():
     '''Return the list of articles in the database.'''
     db = RevisionDB(config={'host': config['default'].MONGO_HOST, 'port': config['default'].MONGO_PORT, 'username': config['default'].MONGO_USERNAME, 'password': config['default'].MONGO_PASSWORD})
-    arts=db.find_articles()
+    arts=db.articles()
     #convert the collection of articles to a json response 
     return Response(
         json_util.dumps(arts),
