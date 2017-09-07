@@ -16,7 +16,16 @@ def revisions():
 
     db = RevisionDB(config={'host': config['default'].MONGO_HOST, 'port': config['default'].MONGO_PORT, 'username': config['default'].MONGO_USERNAME, 'password': config['default'].MONGO_PASSWORD})
 
-    revisions = db.paginate(page)
+    # Build query
+    query={}
+    
+    if 'pageid' in request.args:
+        query={'pageid':int(request.args.get('pageid'))}
+
+    if 'title' in request.args:
+        query={'title':request.args.get('title')}
+
+    revisions = db.paginate(query,page)
     
     return Response(
         json_util.dumps(revisions),
