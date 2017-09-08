@@ -21,9 +21,12 @@ class RevisionDB(object):
     def db():
         return self.db
 
-    def revisions(self, query={}):
-        return self.db.revisions.find(query)
-
+    def revisions(self, query={}, page=None, per_page=None):
+        if page==None or per_page==None:
+            return self.db.revisions.find(query)
+        else:
+            return self.db.revisions.find(query).skip((page-1)*per_page).limit(per_page)
+    
     def articles(self, query={}):
         return self.db.articles.find(query)
 
@@ -82,11 +85,11 @@ class RevisionDB(object):
         revisions = self.db.revisions.remove({})
         return revisions
 
-    def paginate(self, query={}, page=1):
-        revisions = self.db.revisions.find(query).skip((page-1)*self.per_page).limit(self.per_page)
+    def paginate(self, query={}, page=1,per_page=20):
+        revisions = self.db.revisions.find(query).skip((page-1)*per_page).limit(per_page)
         return revisions
 
-    def paginate_for_query(self, filters, projection,page, per_page):
+    def paginate_for_query(self, filters, projection,page, per_page=20):
         revisions = self.db.revisions.find(filters,projection).skip((page-1)*per_page).limit(per_page)
         return revisions
 
