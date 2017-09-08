@@ -55,7 +55,7 @@ class ProductionConfig(Config):
 
 class DigitalOceanConfig(Config):
     MONGO_HOST = os.environ.get('MONGO_HOST')
-    MONGO_PORT = int(os.environ.get('MONGO_PORT'))
+    MONGO_PORT = int(os.environ.get('MONGO_PORT') or 27017)
     MONGO_USERNAME = os.environ.get('MONGO_USERNAME')
     MONGO_PASSWORD = os.environ.get('MONGO_PASSWORD')
     SSL_DISABLE = True
