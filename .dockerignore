@@ -14,3 +14,4 @@ run.sh
 uwsgi.ini
 README.md
 Dockerfile
+local/
