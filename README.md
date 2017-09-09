@@ -1,5 +1,5 @@
 # wiki-history-extractor-api
-API developed to get metrics of the history revisions of wiki articles.
+A custom API to extract, query and get metrics from wikipedia article revisions.
 
 ### Recommended Requirements
 
@@ -65,11 +65,12 @@ API developed to get metrics of the history revisions of wiki articles.
 	
 * Run Servers
 	* Generate `docker-compose.yml` file: `cp docker-compose.development.yml docker-compose.yml`
+		* Use `docker-compose.replicas.yml` if you want to use a mongodb service with replicas and shards
 	* `docker-compose build`
 	* `docker network create wikihistoryextractorapi_wiki_network`
 	* `docker network create wikihistoryextractorapi_wiki_default`
 	* `docker-compose scale mongo=1 rabbit=1 flask=3 nginx=1`
-	* Go to `localhost:88`
+	* Go to `localhost/api/v1/`
 
 ### Endpoints
 
