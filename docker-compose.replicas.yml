@@ -1,0 +1,199 @@
+version: '3'
+
+services:
+
+    rabbit:
+        image: rabbitmq:3.6.11
+        restart: always
+        hostname: rabbit
+        environment:
+            - RABBITMQ_DEFAULT_USER=wiki
+            - RABBITMQ_DEFAULT_PASS=wiki123
+        ports:
+            - "5673:5672"
+        networks:
+            - wiki_network
+        volumes:
+            - 'wiki_rabbit:/data'
+
+    mongors1n1:
+        container_name: mongors1n1
+        hostname: mongors1n1
+        image: mongo:3.4.7
+        command: mongod --shardsvr --replSet mongors1
+        expose:
+            - "27018"
+        volumes:
+            - 'wiki_mongors1n1:/data/db'
+        networks:
+            - wiki_network
+
+    mongors1n2:
+        container_name: mongors1n2
+        hostname: mongors1n2
+        image: mongo:3.4.7
+        command: mongod --replSet mongors1 --dbpath /data/db --oplogSize 16 --shardsvr
+        expose:
+            - "27018"
+        networks:
+            - wiki_network
+
+    mongors1n3:
+        container_name: mongors1n3
+        hostname: mongors1n3
+        image: mongo:3.4.7
+        command: mongod --replSet mongors1 --dbpath /data/db --oplogSize 16 --shardsvr
+        expose:
+            - "27018"
+        networks:
+            - wiki_network
+
+    mongors2n1:
+        container_name: mongors2n1
+        hostname: mongors2n1
+        image: mongo:3.4.7
+        command: mongod --replSet mongors2 --dbpath /data/db --oplogSize 16 --shardsvr
+        expose:
+            - "27018"
+        volumes:
+            - 'wiki_mongors2n1:/data/db'
+        networks:
+            - wiki_network
+
+    mongors2n2:
+        container_name: mongors2n2
+        hostname: mongors2n2
+        image: mongo:3.4.7
+        command: mongod --replSet mongors2 --dbpath /data/db --oplogSize 16 --shardsvr
+        expose:
+            - "27018"
+        networks:
+            - wiki_network
+
+    mongors2n3:
+        container_name: mongors2n3
+        hostname: mongors2n3
+        image: mongo:3.4.7
+        command: mongod --replSet mongors2 --dbpath /data/db --oplogSize 16 --shardsvr
+        expose:
+            - "27018"
+        networks:
+            - wiki_network
+
+    mongocfg1:
+        container_name: mongocfg1
+        hostname: mongocfg1
+        image: mongo:3.4.7
+        command: mongod --dbpath /data/configdb --configsvr --port 27019 --replSet configrs
+        expose:
+            - "27019"
+        volumes:
+            - 'wiki_mongocfg1:/data/configdb'
+        networks:
+            - wiki_network
+
+    mongocfg2:
+        container_name: mongocfg2
+        hostname: mongocfg2
+        image: mongo:3.4.7
+        command: mongod --dbpath /data/configdb --configsvr --port 27019 --replSet configrs
+        expose:
+            - "27019"
+        volumes:
+            - 'wiki_mongocfg2:/data/configdb'
+        networks:
+            - wiki_network
+
+    mongocfg3:
+        container_name: mongocfg3
+        hostname: mongocfg3
+        image: mongo:3.4.7
+        command: mongod --dbpath /data/configdb --configsvr --port 27019 --replSet configrs
+        expose:
+            - "27019"
+        volumes:
+            - 'wiki_mongocfg3:/data/configdb'
+        networks:
+            - wiki_network
+
+    mongo:
+        container_name: mongo
+        hostname: mongo
+        image: mongo:3.4.7
+        depends_on:
+            - mongocfg1
+            - mongocfg2
+            - mongocfg3
+            - mongors1n1
+            - mongors2n1
+        command: mongos --configdb configrs/mongocfg1:27019,mongocfg2:27019,mongocfg3:27019
+        environment:
+            - MONGO_INITDB_ROOT_USERNAME=wiki
+            - MONGO_INITDB_ROOT_PASSWORD=wiki123
+        ports:
+            - 27018:27017
+        volumes:
+            - 'wiki_mongos1:/data/db'
+        networks:
+            - wiki_network
+
+    nginx:
+        image: nginx:1.13.3
+        restart: always
+        links:
+            - flask
+        ports:
+            - "80:80"
+        networks:
+          - wiki_network
+        volumes:
+            - './environments/light/nginx/nginx.conf:/etc/nginx/nginx.conf:ro'
+        depends_on:
+            - flask
+            
+    flask:
+        build: .
+        restart: always
+        environment:
+            - FLASK_CONFIG=docker
+            - PYTHONBUFFERED=true
+            - FLASK_DEBUG=1
+        links:
+            - rabbit
+        ports:
+            - '80'
+        networks:
+            - wiki_network
+        volumes:
+            - '.:/app'
+        depends_on:
+            - rabbit
+    
+    worker:
+        build: .
+        restart: always
+        command: celery worker -A celery_worker.celery --loglevel=info
+        environment:
+            - FLASK_CONFIG=docker
+            - PYTHONBUFFERED=true
+            - FLASK_DEBUG=1
+        links:
+            - rabbit
+        networks:
+            - wiki_network
+        volumes:
+            - '.:/app'
+        depends_on:
+            - rabbit
+
+volumes:
+    wiki_rabbit:
+    wiki_mongors1n1:
+    wiki_mongors2n1:
+    wiki_mongocfg1:
+    wiki_mongocfg2:
+    wiki_mongocfg3:
+    wiki_mongos1:
+
+networks:
+    wiki_network:
