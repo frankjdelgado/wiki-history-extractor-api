@@ -1,9 +1,9 @@
 from flask import Flask, request, jsonify, Response, url_for
 import urlparse
 from bson import json_util
-from . import api,auto
+from . import api
 from app.tasks.app_tasks import hello, extract_article
-
+from manage import auto
 
 @api.route('/status/<task_id>')
 @auto.doc()

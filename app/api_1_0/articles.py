@@ -1,11 +1,12 @@
 from flask import Flask, request, jsonify, Response, url_for
 import urlparse
 from bson import json_util
-from . import api,auto
+from . import api
 from vendors.db_connector import RevisionDB
 from config import config, Config
+from manage import auto
 
-@api.route('/articles', methods=['GET', 'POST'])
+@api.route('/articles', methods=['GET'])
 @auto.doc()
 def articles_task():
     '''Return the list of articles in the database.'''
@@ -18,7 +19,7 @@ def articles_task():
     )
 
 
-@api.route('/articles/<page_id>',methods=['GET', 'POST'])
+@api.route('/articles/<page_id>',methods=['GET'])
 @auto.doc()
 def article_info(page_id):
     '''Return the information of the Article in the database with the given page_id.'''

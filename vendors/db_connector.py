@@ -1,6 +1,7 @@
 from pymongo import MongoClient
 import json
 from datetime import datetime
+from bson.objectid import ObjectId
 
 class RevisionDB(object):
     
@@ -22,6 +23,11 @@ class RevisionDB(object):
         return self.db
 
     def revisions(self, query={}, page=None, per_page=None):
+        
+        for term in query:
+            if term == "_id":
+                query[term] = ObjectId(query[term]) 
+
         if page==None or per_page==None:
             return self.db.revisions.find(query)
         else:
@@ -86,6 +92,11 @@ class RevisionDB(object):
         return revisions
 
     def paginate(self, query={}, page=1,per_page=20):
+        if page < 1:
+            page = 1
+        if page_size > 250:
+            page_size = 250
+
         revisions = self.db.revisions.find(query).skip((page-1)*per_page).limit(per_page)
         return revisions
 

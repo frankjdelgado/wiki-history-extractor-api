@@ -3,7 +3,8 @@ from app.tasks.app_tasks import extract_article
 
 import urlparse
 from bson import json_util
-from . import api,auto
+from . import api
+from manage import auto
 
 
 @api.route('/extract', methods=['GET', 'POST'])

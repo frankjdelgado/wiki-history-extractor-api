@@ -1,4 +1,6 @@
 import os
+from flask_autodoc import Autodoc
+
 COV = None
 if os.environ.get('FLASK_COVERAGE'):
     import coverage
@@ -18,7 +20,7 @@ from flask_apidoc.commands import GenerateApiDoc
 
 app = create_app(os.getenv('FLASK_CONFIG') or 'default')
 manager = Manager(app)
-
+auto = Autodoc(app)
 
 def make_shell_context():
     return dict(app=app)
