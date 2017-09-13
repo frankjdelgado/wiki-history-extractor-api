@@ -1,5 +1,6 @@
 whitelists = {
-	'api.revisions': ['comment','anon','pageid','tags','timestamp','userid','revid','contentformat','contentmodel','extraction_date','parentid','title','_id','size','user','minor']
+	'api.revisions': ['comment','anon','pageid','tags','timestamp','userid','revid','contentformat','contentmodel','extraction_date','parentid','title','_id','size','user','minor'],
+	'api.articles': ['title','ns','first_extraction_date','last_extraction_date','last_revision_extracted']
 }
 
 param_type = {
@@ -7,7 +8,8 @@ param_type = {
 	'userid': 'int',
 	'revid': 'int',
 	'size': 'int',
-	'userid': 'int'
+	'userid': 'int',
+	'ns': 'int'
 }
 
 def filter_params(request):
