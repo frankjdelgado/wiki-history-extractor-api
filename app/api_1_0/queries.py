@@ -2,9 +2,9 @@ from flask import Flask, request, jsonify, Response, url_for
 import urlparse
 from bson import json_util
 from .errors import bad_request 
-from . import api,auto,articles
+from . import api,articles
 from app.tasks.app_tasks import count_task, avg_task, mode_task
-
+from manage import auto
 
 @api.route('/count', methods=['GET'])
 @auto.doc()
