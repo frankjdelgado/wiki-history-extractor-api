@@ -1,5 +1,5 @@
 # wiki-history-extractor-api
-A custom API to extract, query and get metrics from wikipedia article revisions.
+A custom API to extract and display wikipedia article revisions. Provide custom metrics
 
 ### Recommended Requirements
 
