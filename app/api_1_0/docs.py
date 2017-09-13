@@ -5,5 +5,5 @@ from manage import auto
 @api.route('/', methods=['GET'])
 @auto.doc()
 def docs():
-    '''Shows this Documentation'''
+    '''Documentation Page'''
     return auto.html(title='Wiki History Extractor API', template="autodoc_custom.html")

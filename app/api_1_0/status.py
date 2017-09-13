@@ -8,7 +8,7 @@ from manage import auto
 @api.route('/status/<task_id>')
 @auto.doc()
 def task_status(task_id):
-    '''Check the current state of a given task. The function receives the task id and return the state.'''
+    '''Display the current state for the given task_id.'''
     name = request.args.get('name')
 
     if name == "hello":
