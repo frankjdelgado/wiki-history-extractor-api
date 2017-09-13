@@ -9,7 +9,7 @@ from config import config, Config
 @api.route('/revisions', methods=['GET'])
 @auto.doc()
 def revisions():
-    """Display revisions
+    """Return list of article revisions
     
     Pagination:
     - page: Page number. Defaults to 1. Example: ?page=2
