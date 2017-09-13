@@ -1,10 +1,10 @@
 import os
-from flask import Flask, request, Response, send_from_directory
+from flask import Flask, request, send_from_directory, redirect, url_for
 from . import main
 
 @main.route('/', methods=['GET'])
 def index():
-    return "Hello World!"
+    return redirect(url_for('api.docs'))
 
 @main.route('/favicon.ico')
 def favicon():
