@@ -17,6 +17,9 @@ param_type = {
 	'ns': 'int'
 }
 
+#This function will use the whitelist based on the name of the enpoint, and compare 
+#the parameters included in the request with it. The function will return a dictionary containing
+#the arguments and values that belong to the request and are whitelisted
 def filter_params(request):
 	result = {}
 
@@ -30,6 +33,8 @@ def filter_params(request):
 
 	return result
 
+#This function will use the whitelist mode_attribute and compare the attribute parameter of the request 
+#The function will return the name of the attribute in case is whitelisted, or None otherwise.
 def mode_param(request):
 	param= request.args.get('attribute')
 	if param in whitelists['mode_attributes']:
