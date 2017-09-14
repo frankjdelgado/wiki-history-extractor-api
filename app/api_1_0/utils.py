@@ -3,8 +3,8 @@ whitelists = {
 	'api.count':['title','pageid','user','userid','tag','size','sizematch','date','datestart','dateend'],
 	'api.avg':['title','pageid','user','userid','tag','size','sizematch','date','datestart','dateend'],
 	'api.mode':['title','pageid','user','userid','tag','size','sizematch','date','datestart','dateend'],
-	'mode_attributes':['title','user','size','userid','date'],
-	'api.articles': ['title','ns','first_extraction_date','last_extraction_date','last_revision_extracted']
+	'api.articles': ['title','ns','first_extraction_date','last_extraction_date','last_revision_extracted'],
+	'mode_attributes':['title','user','size','userid','date']
 }
 
 param_type = {
@@ -17,13 +17,10 @@ param_type = {
 	'ns': 'int'
 }
 
-def filter_params(request,whitelist_category=None):
-	if whitelist_category==None:
-		whitelist_category= request.url_rule.endpoint
-
+def filter_params(request):
 	result = {}
 
-	for param in whitelists[whitelist_category]:
+	for param in whitelists[request.url_rule.endpoint]:
 		#print(param)
 		if request.args.get(param) != None:
 			if param in param_type and param_type[param] == 'int':
@@ -34,10 +31,8 @@ def filter_params(request,whitelist_category=None):
 	return result
 
 def mode_param(request):
-	result = None
-	for param in whitelists['mode_attributes']:
-		#print(param)
-		if request.args.get('attribute') == param:
-			result = param
-			break
-	return result
+	param= request.args.get('attribute')
+	if param in whitelists['mode_attributes']:
+		return param
+	else:
+		return None

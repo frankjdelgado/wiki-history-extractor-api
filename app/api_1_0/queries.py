@@ -25,7 +25,22 @@ def conditions_query(arguments):
 @api.route('/count', methods=['GET'])
 @auto.doc()
 def count():
-    '''The function execute the count query, which returns the amount of revisions which match the criteria. The function can receive several parameters to filtering the results: title: the name of the wiki article of the revisions. user: the name of the Author of the revisions. tag: a given tag of the revision. size: the size of the revision. sizematch: Used with size filtering, to match the revisions greater , lesser or exact size as given. (Dates will be in format YYYY-MM-DD) date: a given date for match revisions made that date. datestart: date from which will match the revisions. If there is not dateend as arg, dateend would be consider the current date. dateend: date until which will match the revisions. If there is not datestart as arg, datestart would be consider the date of the first revision entered.'''
+    '''Execute the count query
+
+    Returns the amount of revisions which match the criteria. 
+
+    The function can receive several parameters to filtering the results:
+    -title: the name of the wiki article of the revisions.
+    -user: the name of the Author of the revisions.
+    -tag: a given tag of the revision.
+    -size: the size of the revision.
+    -sizematch: Used with size filtering, to match the revisions greater , lesser or exact size as given.
+    -date: a given date for match revisions made that date.
+    -datestart: date from which will match the revisions. If there is not dateend as arg, dateend would be consider the current date.
+    -dateend: date until which will match the revisions. If there is not datestart as arg, datestart would be consider the date of the first revision entered.
+    (Note: Dates will be in format YYYY-MM-DD)
+    '''
+
     arguments=filter_params(request,'filter_attributes')
     error_message=conditions_query(arguments)
     if error_message != None:
@@ -42,7 +57,22 @@ def count():
 @api.route('/avg', methods=['GET'])
 @auto.doc()
 def avg():
-    '''The function execute the average query, which returns the average of revisions which match the criteria between 2 dates. The function can receive one or more criteria to filtering the results, besides the dates of the interval: title: the name of the wiki article of the revisions. user: the name of the Author of the revisions. tag: a given tag of the revision. size: the size of the revision. sizematch: Used with size filtering, to match the revisions greater, lesser or exact size as given. (Dates will be in format YYYY-MM-DD) datestart: initial date of the interval from which will match the revisions. dateend: final date of the interval until which will match the revisions.'''
+    '''Execute the average query
+
+    Returns the average of revisions which match the criteria between 2 dates.
+
+    The function can receive one or more criteria to filtering the results, besides the dates of the interval:
+    -title: the name of the wiki article of the revisions. 
+    -user: the name of the Author of the revisions. 
+    -tag: a given tag of the revision. 
+    -size: the size of the revision. 
+    -sizematch: Used with size filtering, to match the revisions greater, lesser or exact size as given. 
+
+    An explicit date interval is necessary for the query: (Dates will be in format YYYY-MM-DD) 
+    -datestart: initial date of the interval from which will match the revisions. 
+    -dateend: final date of the interval until which will match the revisions.
+    '''
+
     arguments=filter_params(request,'filter_attributes')
     error_message=conditions_query(arguments)
     if error_message != None:
@@ -61,7 +91,21 @@ def avg():
 @api.route('/mode', methods=['GET'])
 @auto.doc()
 def mode():
-    '''The function execute the mode query, which returns the amount of criteria of most repetitions from the revisions. The function receive ONE CRITERIA, using the -attribute- key, and one of the following values: title: the name of the wiki article of the revisions. user: the name of the Author(s) which wrote most revisions. size: the size of revision(s) most repeated. date: the date on which most revisions were written. For now, mode for tag criteria is disabled, due to lack of tags in revisions. It can ALSO receive filtering arguments to limit the range'''
+    '''Execute the mode query
+
+    Returns the value or values of most repetitions from the revisions, given an attribute. 
+
+    The function receive ONE CRITERIA as mode attribute, using the 'attribute' argument, which will contain an argument's name, among the valid arguments there are:
+    -title: the name of the wiki article of the revisions.
+    -user: the name of the Author(s) which wrote most revisions.
+    -size: the size of revision(s) most repeated.
+    -date: the date on which most revisions were written.
+    For now, mode for tag criteria is disabled, due to lack of tags in revisions.
+
+    The function can also receive filtering arguments to limit the range, as with count function.
+    It is recommended be specially careful about filtering the range of the revisions.
+    For instance, avoid use unique date filter when using date as mode attribute, because it will return as best scenario the same date(in that case it is better to use a date interval)
+    '''
     arguments=filter_params(request,'filter_attributes')
     error_message=conditions_query(arguments)
     if error_message != None:
