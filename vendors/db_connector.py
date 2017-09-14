@@ -33,8 +33,15 @@ class RevisionDB(object):
         else:
             return self.db.revisions.find(query).skip((page-1)*per_page).limit(per_page)
     
-    def articles(self, query={}):
-        return self.db.articles.find(query)
+    def articles(self, query={}, page=None, per_page=None):
+        for term in query:
+            if term == "_id":
+                query[term] = ObjectId(query[term]) 
+
+        if page==None or per_page==None:
+            return self.db.articles.find(query)
+        else:
+            return self.db.articles.find(query).skip((page-1)*per_page).limit(per_page)
 
     def article(self,query={}):
         return self.db.articles.find_one(query)

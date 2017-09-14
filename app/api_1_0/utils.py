@@ -1,7 +1,10 @@
 whitelists = {
 	'api.revisions': ['comment','anon','pageid','tags','timestamp','userid','revid','contentformat','contentmodel','extraction_date','parentid','title','_id','size','user','minor'],
-	'filter_attributes':['title','pageid','user','userid','tag','size','sizematch','date','datestart','dateend'],
-	'mode_attributes':['title','user','size','userid','date']
+	'api.count':['title','pageid','user','userid','tag','size','sizematch','date','datestart','dateend'],
+	'api.avg':['title','pageid','user','userid','tag','size','sizematch','date','datestart','dateend'],
+	'api.mode':['title','pageid','user','userid','tag','size','sizematch','date','datestart','dateend'],
+	'mode_attributes':['title','user','size','userid','date'],
+	'api.articles': ['title','ns','first_extraction_date','last_extraction_date','last_revision_extracted']
 }
 
 param_type = {
@@ -10,7 +13,8 @@ param_type = {
 	'revid': 'int',
 	'size': 'int',
 	'sizematch':'int',
-	'userid': 'int'
+	'userid': 'int',
+	'ns': 'int'
 }
 
 def filter_params(request,whitelist_category=None):
