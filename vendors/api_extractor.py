@@ -76,7 +76,7 @@ class RevisionExtractor(object):
 
         total_revisions = 0
 
-        batch = self.get_one()
+        batch = self.get_one(1)
         
         if batch == False:
             return total_revisions
@@ -107,7 +107,7 @@ class RevisionExtractor(object):
         self.get_article()
         return total_revisions
 
-    def get_one(self):
+    def get_one(self,get_article=None):
         if self.url != None:
             r = requests.get(self.url, params=self.payload)
             if r.status_code == requests.codes.ok:
@@ -123,6 +123,9 @@ class RevisionExtractor(object):
                 }
                 if self.save(data, article) == False:
                     return False
+                #if get_article flag is set, get_article is called
+                if get_article != None:
+                    self.get_article()
 
                 return response
             else:
