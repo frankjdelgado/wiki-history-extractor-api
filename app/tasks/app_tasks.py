@@ -43,35 +43,41 @@ def clean_revisions(self, title):
             'result': "%d revisions extracted" % total}
             
 @celery.task(bind=True)
-def count_task(self,code,values):
+def count_task(self,arguments):
 
     db = RevisionDB(config={'host': config['default'].MONGO_HOST, 'port': config['default'].MONGO_PORT, 'username': config['default'].MONGO_USERNAME, 'password': config['default'].MONGO_PASSWORD})
     #instantiate a new QueryHandler to get execute the corresponding function
     handler = QueryHandler(db=db)
-    number = handler.get_count(code,values)
-
-    return {'status': 'Task completed!', 
-            'count': "%d" % number}
+    number = handler.get_count(arguments)
+    if number!=None:
+        return {'status': 'Task completed!', 
+                'count': "%d" % number}
+    else:
+        return {'status': 'Task failed!'}
 
 @celery.task(bind=True)
-def avg_task(self,code,values):
+def avg_task(self,values):
 
     db = RevisionDB(config={'host': config['default'].MONGO_HOST, 'port': config['default'].MONGO_PORT, 'username': config['default'].MONGO_USERNAME, 'password': config['default'].MONGO_PASSWORD})
     #instantiate a new QueryHandler to get execute the corresponding function
     handler = QueryHandler(db=db)
-    number = handler.get_avg(code,values)
+    number = handler.get_avg(values)
+    if number!=None:
+        return {'status': 'Task completed!', 
+                'avg': "%f" % number}
+    else:
+        return {'status': 'Task failed!'}
 
-    return {'status': 'Task completed!', 
-            'avg': "%f" % number}
 
 @celery.task(bind=True)
-def mode_task(self,attribute,code,values):
+def mode_task(self,values,mode_attribute):
 
     db = RevisionDB(config={'host': config['default'].MONGO_HOST, 'port': config['default'].MONGO_PORT, 'username': config['default'].MONGO_USERNAME, 'password': config['default'].MONGO_PASSWORD})
     #instantiate a new QueryHandler to get execute the corresponding function
     handler = QueryHandler(db=db)
-    number = handler.get_mode(attribute,code,values)
-
-    return {'status': 'Task completed!', 
-    'result': "%s" % number}
-
+    number = handler.get_mode(values,mode_attribute)
+    if number!=None:
+        return {'status': 'Task completed!', 
+        'result': "%s" % number}
+    else:
+        return {'status': 'Task failed!'}
