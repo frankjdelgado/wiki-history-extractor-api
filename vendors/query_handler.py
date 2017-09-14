@@ -5,28 +5,9 @@ from itertools import chain
 class QueryHandler(object):
     
     data={}
-    
+
     def __init__(self, pageid=None , db=None):
         self.db = db
-
-    #function which get the quantity of revisions
-    #tested
-    def filter_by_title(self,values):
-        #values is a list composed by 1 value, the user title of the article to filter by
-        data={'title':values[0]}
-        return data
-
-    def filter_by_user(self,values):
-        #values is a list composed by 1 value, the user name to filter by
-        data={'user':values[0]}
-        return data
-
-    def filter_by_tag(self,values):
-        #values is a list composed by 1 value, the tag to filter by
-        #NOTE: if necesary, it can be added a functionality to filter by multiple tags with logical OR, AND, XOR, etc.
-        data={'tags':values[0]}
-        return data
-
 
     def filter_by_size(self,values):
         #values is a list composed by 2 values, the size to filter by, and the order of filtering
@@ -34,11 +15,11 @@ class QueryHandler(object):
         # when the order is lesser than 0, it will return the revisions which size are lesser than the argument
         # if the order is 0, it will return the revisions which size are exactly as the argument
         if values[1] > 0:
-            data={'size': {'$gt': values[0]} }
+            data={'size': {'$gt': int(values[0])} }
         elif values[1] < 0:
-            data={'size': {'$lt': values[0]} }
+            data={'size': {'$lt': int(values[0])} }
         else:
-            data={'size':values[0] }
+            data={'size':int(values[0]) }
         return data
 
 
@@ -49,8 +30,8 @@ class QueryHandler(object):
         # 1 value: one date. It will return the revisions made that date.
         # 2 values: two dates. It will return the revisions made between those dates, inclusive
         # 2 values: one date and one integer. 
-        # If the integer is -1: It will return the revisions made from the first revision until the date.
-        # If the integer is 1: It will return the revisions made from the date until the last revision.
+        # If the integer is -1: It will return the revisions made from the first revision until the date given as argument.
+        # If the integer is 1: It will return the revisions made from the date given as argument until the last revision.
         # the strptime convert the string arguments into datetime datatype
         if len(values) == 1:
             date_i=datetime.datetime.strptime(values[0],date_format)
@@ -80,63 +61,68 @@ class QueryHandler(object):
                     return data
 
 
-    #the filter allows multiple filters, based on the attribute argument: 
-    # 11111 - 00000 -> 1 on . 0 off
-    # 1XXXX apply title filter
-    # X1XXX apply user filter
-    # XX1XX apply tag filter
-    # XXX1X apply size filter
-    # XXXX1 apply date filter 
-    def filter_by(self,attribute,values):
-        token=attribute
+    def filter_by(self,arguments):
         query={}
-        valueslist=values
         option=False
-        if token / 10000 == 1:
-            query.update(self.filter_by_title(valueslist))
-            del valueslist[0]
+        dateDone=False
+        sizeDone=False
+        for key,value in arguments.items():
             option=True
-        token= token % 10000 
-        if token / 1000 == 1:                                                                     
-            query.update(self.filter_by_user(valueslist))
-            del valueslist[0]
-            option=True
-        token= token % 1000 
-        if token / 100 == 1:
-            query.update(self.filter_by_tag(values))
-            del valueslist[0]
-            option=True
-        token= token % 100 
-        if token / 10 == 1:
-            query.update(self.filter_by_size(values))
-            del valueslist[0]
-            del valueslist[0]
-            option=True
-        token= token % 10 
-        if token == 1:
-            query.update(self.filter_by_date(values))
-            option=True
+            #check if the argument is date(to apply the date filter)
+            if key in ('date','datestart','dateend'):
+                if dateDone == False :
+                    dateDone = True
+                    if key == 'date':
+                        query.update(self.filter_by_date([value]))
+                    elif key == 'datestart':
+                        if 'dateend' in arguments:
+                            query.update(self.filter_by_date([value,arguments.get('dateend')]))
+                        else:
+                            query.update(self.filter_by_date([value,1]))
+                    elif key == 'dateend':
+                        if 'datestart' in arguments:
+                            query.update(self.filter_by_date([arguments.get('datestart'),value]))
+                        else:
+                            query.update(self.filter_by_date([value,-1]))
+
+            #check if the argument is size(to apply the size filter)
+            elif key in ('size','sizematch'):
+                if sizeDone==False:
+                    sizeDone=True
+                    if key == 'size':
+                        if 'sizematch' in arguments:
+                            query.update(self.filter_by_size([value,arguments.get('sizematch',None, int)]))
+                        else:
+                            query.update(self.filter_by_size([value,0]))
+                    else:
+                        if 'size' in arguments:
+                            query.update(self.filter_by_size([ arguments.get('size') , value]))
+            else:
+                query.update({ key : value })
+
         if option==False:
             print 'Wrong Filter Option'
             return ''
         else:
             return query
         
-    def get_count(self,filter_by_attribute,values):
-        data=self.filter_by(filter_by_attribute,values)
+    def get_count(self,arguments):
+        data=self.filter_by(arguments)
         if data!='':
             return self.db.count(data)
-
+        else:
+            return None
 
     #1 for user,2 for tag, 3 for size
     #besides the values required to filter(eg: username for user filtering, size and order for size filtering), it requires 2 values, as with date filtering for 2 dates-interval
-    def get_avg(self,filter_by_attribute,values):
+    def get_avg(self,values):
+        #arguments=values.copy()
         # the filter to set avg is converted in a code with date filtering included
-        data=self.filter_by(filter_by_attribute,values)
+        data=self.filter_by(values)
         date_format = '%Y-%m-%d'
         #the dates are extracted and are calculated the number of days with the .days function (datetime.timedelta library)
-        date_i=datetime.datetime.strptime(values[len(values)-2],date_format)
-        date_f=datetime.datetime.strptime(values[len(values)-1],date_format)
+        date_i=datetime.datetime.strptime(values.get('datestart'),date_format)
+        date_f=datetime.datetime.strptime(values.get('dateend'),date_format)
         days=(date_f-date_i).days +1
         if data!='':
             res= self.db.count(data)
@@ -145,66 +131,51 @@ class QueryHandler(object):
 
     #function that gets the mode(moda) for an attribute, for now it works with users, size and date, because tags are mostly empty
     #Besides, it supports filter values, to make detailed measures.
-    def get_mode(self,attribute_mode,filter_by_attribute,values):
+    def get_mode(self,values,mode_attribute,per_page=1000):
         data=''
+        attribute=mode_attribute
         #it is made the match of the revision, filtering by attributes
-        data=self.filter_by(filter_by_attribute,values)
+        data=self.filter_by(values)
         #then it is created the projection for the query
         projection={'_id':0}
-        attribute=''
-        if attribute_mode==1:
-            projection.update({'user':1})
-            attribute='user'
-        elif attribute_mode==2:
-            projection.update({'size':1})
-            attribute='size'
-#        elif attribute_mode==3:
-#            projection.update({'tags':1})
-#            attribute='tags'
-        elif attribute_mode==4:
-            projection.update({'timestamp':1})
-            attribute='timestamp'
-        elif attribute_mode==5:
-            projection.update({'title':1})
-            attribute='title'
-        else:
-            projection=''
+        if attribute == 'date':
+            attribute= 'timestamp'
+        projection.update({attribute:1})
+
+        #first, we calculate how many revisions will be extracted, to extract them in chunks of 1000
+        n_revisions=self.db.count(data)
+        total=1+ n_revisions/per_page
+        revisions=[]
+        #now, the revisions are extracted in chunks, and saved in a cursor
+        for page in xrange(1, total+1):
+            aux=self.db.paginate_for_query(data,projection,page,per_page)
+            #the cursor is concatenated with the revisions cursor
+            revisions=[x for x in chain(revisions, aux)]
+        valueslist=[]
+        repetitionslist=[]
+        #after collect the projected revisions, it is checked which values appears most,
+        #adding them to a list, and keeping track of their appearances on another list
+        if attribute=='timestamp':
+            date_format = '%Y-%m-%d'
+            for rev in revisions:
+                date= rev[attribute].strftime(date_format)
+                if not (date in valueslist) :
+                    valueslist.append(date)
+                    repetitionslist.append(1)
+                else:
+                    position= valueslist.index(date)
+                    repetitionslist[position]=repetitionslist[position]+1
+        else:            
+            for rev in revisions:
+                if not (rev[attribute] in valueslist) :
+                    valueslist.append(rev[attribute])
+                    repetitionslist.append(1)
+                else:
+                    position= valueslist.index(rev[attribute])
+                    repetitionslist[position]=repetitionslist[position]+1
         
-        if projection!='':
-            #first, we calculate how many revisions will be extracted, to extract them in chunks of 1000
-            per_page=1000
-            n_revisions=self.db.count(data)
-            total=1+ n_revisions/per_page
-            revisions=[]
-            #now, the revisions are extracted in chunks, and saved in a cursor
-            for page in xrange(1, total+1):
-                aux=self.db.paginate_for_query(data,projection,page,per_page)
-                #the cursor is concatenated with the revisions cursor
-                revisions=[x for x in chain(revisions, aux)]
-            valueslist=[]
-            repetitionslist=[]
-            #after collect the projected revisions, it is checked which values appears most,
-            #adding them to a list, and keeping track of their appearances on another list
-            if attribute=='timestamp':
-                date_format = '%Y-%m-%d'
-                for rev in revisions:
-                    date= rev[attribute].strftime(date_format)
-                    if not (date in valueslist) :
-                        valueslist.append(date)
-                        repetitionslist.append(1)
-                    else:
-                        position= valueslist.index(date)
-                        repetitionslist[position]=repetitionslist[position]+1
-            else:            
-                for rev in revisions:
-                    if not (rev[attribute] in valueslist) :
-                        valueslist.append(rev[attribute])
-                        repetitionslist.append(1)
-                    else:
-                        position= valueslist.index(rev[attribute])
-                        repetitionslist[position]=repetitionslist[position]+1
-            
-            # it is calculated the value most repeated
+        # it is calculated the value most repeated
+        if len(repetitionslist)>0:
             maxi=max(repetitionslist)
             mode=[]
             i=0
@@ -218,11 +189,7 @@ class QueryHandler(object):
                         mode.append(valueslist[i])
                 i=i+1
             return mode
-    
-
-#    @classmethod
-    #test method for inserting formatted timestamps
-#    def insert_dates(self):
-#        RevisionDB.insert_date()
-        
+        else:
+            print 'No revisions found'
+            return []
 
