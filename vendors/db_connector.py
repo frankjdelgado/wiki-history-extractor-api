@@ -22,16 +22,22 @@ class RevisionDB(object):
     def db():
         return self.db
 
-    def revisions(self, query={}, page=None, per_page=None):
+    def revisions(self, query={}, page=None, per_page=None, sort=1):
         
         for term in query:
             if term == "_id":
                 query[term] = ObjectId(query[term]) 
 
+        if sort == 'asc':
+            sort = 1
+        elif sort == 'desc':
+            sort = -1
+
+
         if page==None or per_page==None:
-            return self.db.revisions.find(query)
+            return self.db.revisions.find(query).sort('timestamp', sort)
         else:
-            return self.db.revisions.find(query).skip((page-1)*per_page).limit(per_page)
+            return self.db.revisions.find(query).skip((page-1)*per_page).limit(per_page).sort('timestamp', sort)
     
     def articles(self, query={}, page=None, per_page=None):
         for term in query:

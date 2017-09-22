@@ -14,6 +14,7 @@ def revisions():
     Pagination:
     - page: Page number. Defaults to 1. Example: ?page=2
     - page_size: Number of items per page. Defaults to 20, max size of 200. Example: ?page=1&page_size=100    
+    - sort: Sort by timestamps. Example: ?sort=asc or ?sort=desc
     
     Filters:
     - comment
@@ -36,12 +37,13 @@ def revisions():
     
     page = request.args.get('page', 1, int)
     page_size = request.args.get('page_size', 20, int)
+    sort = request.args.get('sort', 'asc')
     query = filter_params(request)
     
     db = RevisionDB(config={'host': config['default'].MONGO_HOST, 'port': config['default'].MONGO_PORT, 'username': config['default'].MONGO_USERNAME, 'password': config['default'].MONGO_PASSWORD})
 
     return Response(
-        json_util.dumps(db.revisions(query, page, page_size)),
+        json_util.dumps(db.revisions(query, page, page_size, sort)),
         mimetype='application/json'
     )
 
