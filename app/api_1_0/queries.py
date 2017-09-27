@@ -40,7 +40,7 @@ def count():
     -date: a given date for match revisions made that date.
     -datestart: date from which will match the revisions. If there is not dateend as arg, dateend would be consider the current date.
     -dateend: date until which will match the revisions. If there is not datestart as arg, datestart would be consider the date of the first revision entered.
-    (Note: Dates will be in format YYYY-MM-DD)
+    (Note: Dates will be displayed in format YYYY-MM-DD)
     '''
 
     arguments=filter_params(request)

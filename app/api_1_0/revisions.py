@@ -4,6 +4,7 @@ from bson import json_util
 from . import api, filter_params
 from manage import auto
 from vendors.db_connector import RevisionDB
+from vendors.query_handler import QueryHandler
 from config import config, Config
 
 @api.route('/revisions', methods=['GET'])
@@ -37,11 +38,12 @@ def revisions():
     page = request.args.get('page', 1, int)
     page_size = request.args.get('page_size', 20, int)
     query = filter_params(request)
-    
-    db = RevisionDB(config={'host': config['default'].MONGO_HOST, 'port': config['default'].MONGO_PORT, 'username': config['default'].MONGO_USERNAME, 'password': config['default'].MONGO_PASSWORD})
-
+    db = RevisionDB()
+    handler = QueryHandler(db=db)
+    query = handler.get_query(query)
+    revisions=db.revisions(query, page, page_size)
     return Response(
-        json_util.dumps(db.revisions(query, page, page_size)),
+        json_util.dumps(revisions),
         mimetype='application/json'
     )
 

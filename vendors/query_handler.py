@@ -23,42 +23,44 @@ class QueryHandler(object):
         return data
 
 
-    def filter_by_date(self,values,name='timestamp'):
+
+    # date arguments must be in format: YYYY-MM-DD
+    # the strptime convert the string arguments into datetime datatype
+    # 1 value: one date. It will return the revisions made that date.
+    def filter_by_one_date(self,value,name='timestamp'):
         date_format = '%Y-%m-%d'
-        #values is a list composed by 1 or 2 values: 
-        # date arguments must be in format: YYYY-MM-DD
-        # 1 value: one date. It will return the revisions made that date.
-        # 2 values: two dates. It will return the revisions made between those dates, inclusive
-        # 2 values: one date and one integer. 
-        # If the integer is -1: It will return the revisions made from the first revision until the date given as argument.
-        # If the integer is 1: It will return the revisions made from the date given as argument until the last revision.
-        # the strptime convert the string arguments into datetime datatype
-        if len(values) == 1:
+        date_i=datetime.datetime.strptime(value,date_format)
+        #it is used 2 dates to extract the revision for the whole day, from 0:0 to 23:59
+        date_f=date_i.replace(hour=23,minute=59,second=59)
+        data={name: {'$gte':date_i , '$lte':date_f} }
+        return data
+
+    #values is a list composed by 2 values: 
+    # 2 values: two dates. It will return the revisions made between those dates, inclusive
+    # 2 values: one date and one integer. 
+    # If the integer is -1: It will return the revisions made from the first revision until the date given as argument.
+    # If the integer is 1: It will return the revisions made from the date given as argument until the last revision.
+    def filter_by_date_interval(self,values):
+        date_format = '%Y-%m-%d'
+        #if the second argument is a date:
+        if values[1] != 1 and values[1] != -1 :
             date_i=datetime.datetime.strptime(values[0],date_format)
-            #it is used 2 dates to extract the revision for the whole day, from 0:0 to 23:59
-            date_f=date_i.replace(hour=23,minute=59,second=59)
-            data={name: {'$gte':date_i , '$lte':date_f} }
+            date_f=datetime.datetime.strptime(values[1],date_format)
+            #the date values are adjusted to take into account the day until 23:59
+            date_f=date_f.replace(hour=23,minute=59,second=59)
+            data={'timestamp': {'$gte':date_i , '$lte':date_f} }
             return data
-        elif len(values) == 2:
-            #if the second argument is a date:
-            if values[1] != 1 and values[1] != -1 :
-                date_i=datetime.datetime.strptime(values[0],date_format)
-                date_f=datetime.datetime.strptime(values[1],date_format)
-                #the date values are adjusted to take into account the day until 23:59
-                date_f=date_f.replace(hour=23,minute=59,second=59)
-                data={name: {'$gte':date_i , '$lte':date_f} }
+        else:
+            if values[1] == 1:
+                date=datetime.datetime.strptime(values[0],date_format)
+                data={'timestamp': {'$gte':date} }
                 return data
             else:
-                if values[1] == 1:
-                    date=datetime.datetime.strptime(values[0],date_format)
-                    data={name: {'$gte':date} }
-                    return data
-                else:
-                    date=datetime.datetime.strptime(values[0],date_format)
-                    #the date values are adjusted to take into account the day until 23:59
-                    date=date.replace(hour=23,minute=59,second=59)
-                    data={name: {'$lte':date} }
-                    return data
+                date=datetime.datetime.strptime(values[0],date_format)
+                #the date values are adjusted to take into account the day until 23:59
+                date=date.replace(hour=23,minute=59,second=59)
+                data={'timestamp': {'$lte':date} }
+                return data
 
 
     def filter_by(self,arguments):
@@ -73,17 +75,17 @@ class QueryHandler(object):
                 if dateDone == False :
                     dateDone = True
                     if key == 'date':
-                        query.update(self.filter_by_date([value]))
+                        query.update(self.filter_by_one_date(value))
                     elif key == 'datestart':
                         if 'dateend' in arguments:
-                            query.update(self.filter_by_date([value,arguments.get('dateend')]))
+                            query.update(self.filter_by_date_interval([value,arguments.get('dateend')]))
                         else:
-                            query.update(self.filter_by_date([value,1]))
+                            query.update(self.filter_by_date_interval([value,1]))
                     elif key == 'dateend':
                         if 'datestart' in arguments:
-                            query.update(self.filter_by_date([arguments.get('datestart'),value]))
+                            query.update(self.filter_by_date_interval([arguments.get('datestart'),value]))
                         else:
-                            query.update(self.filter_by_date([value,-1]))
+                            query.update(self.filter_by_date_interval([value,-1]))
 
             #check if the argument is size(to apply the size filter)
             elif key in ('size','sizematch'):
@@ -98,14 +100,13 @@ class QueryHandler(object):
                         if 'size' in arguments:
                             query.update(self.filter_by_size([ arguments.get('size') , value]))
 
-            elif key in ('first_extraction_date','last_extraction_date'):
-                query.update(self.filter_by_date([value],key))
+            elif key in ('first_extraction_date','last_extraction_date','extraction_date','timestamp'):
+                query.update(self.filter_by_one_date(value,key))
 
             else:
                 query.update({ key : value })
 
         if option==False:
-            print 'Wrong Filter Option'
             return ''
         else:
             return query
@@ -194,10 +195,9 @@ class QueryHandler(object):
                 i=i+1
             return mode
         else:
-            print 'No revisions found'
             return []
 
-    def get_articles_query(self,arguments):
+    def get_query(self,arguments):
         data=self.filter_by(arguments)
         if data!='':
             return data

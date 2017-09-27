@@ -28,15 +28,10 @@ def articles():
     page = request.args.get('page', 1, int)
     page_size = request.args.get('page_size', 20, int)
     query = filter_params(request)
-    db = RevisionDB(config={'host': config['default'].MONGO_HOST, 'port': config['default'].MONGO_PORT, 'username': config['default'].MONGO_USERNAME, 'password': config['default'].MONGO_PASSWORD})
+    db = RevisionDB()
     handler = QueryHandler(db=db)
-    query = handler.get_articles_query(query)
-    revisions=db.articles(query, page, page_size)
-    articles=[]
-    for rev in revisions:
-        rev['first_extraction_date']= rev['first_extraction_date'].isoformat()
-        rev['last_extraction_date']= rev['last_extraction_date'].isoformat()
-        articles.append(rev)
+    query = handler.get_query(query)
+    articles=db.articles(query, page, page_size)
     return Response(
         json_util.dumps(articles),
         mimetype='application/json'

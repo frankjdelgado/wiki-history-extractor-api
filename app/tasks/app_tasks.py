@@ -23,7 +23,7 @@ def hello(self):
 @celery.task(bind=True)
 def extract_article(self, title):
 
-    db = RevisionDB(config={'host': config['default'].MONGO_HOST, 'port': config['default'].MONGO_PORT, 'username': config['default'].MONGO_USERNAME, 'password': config['default'].MONGO_PASSWORD})
+    db = RevisionDB()
 
     extractor = RevisionExtractor(payload={'titles': title},title=title, db=db)
     total = extractor.get_all(self)
@@ -34,7 +34,7 @@ def extract_article(self, title):
 @celery.task(bind=True)
 def clean_revisions(self, title):
 
-    db = RevisionDB(config={'host': config['default'].MONGO_HOST, 'port': config['default'].MONGO_PORT, 'username': config['default'].MONGO_USERNAME, 'password': config['default'].MONGO_PASSWORD})
+    db = RevisionDB()
 
     db.find_query({formatted: False})
 
@@ -45,7 +45,7 @@ def clean_revisions(self, title):
 @celery.task(bind=True)
 def count_task(self,arguments):
 
-    db = RevisionDB(config={'host': config['default'].MONGO_HOST, 'port': config['default'].MONGO_PORT, 'username': config['default'].MONGO_USERNAME, 'password': config['default'].MONGO_PASSWORD})
+    db = RevisionDB()
     #instantiate a new QueryHandler to get execute the corresponding function
     handler = QueryHandler(db=db)
     number = handler.get_count(arguments)
@@ -58,7 +58,7 @@ def count_task(self,arguments):
 @celery.task(bind=True)
 def avg_task(self,values):
 
-    db = RevisionDB(config={'host': config['default'].MONGO_HOST, 'port': config['default'].MONGO_PORT, 'username': config['default'].MONGO_USERNAME, 'password': config['default'].MONGO_PASSWORD})
+    db = RevisionDB()
     #instantiate a new QueryHandler to get execute the corresponding function
     handler = QueryHandler(db=db)
     number = handler.get_avg(values)
@@ -72,7 +72,7 @@ def avg_task(self,values):
 @celery.task(bind=True)
 def mode_task(self,values,mode_attribute):
 
-    db = RevisionDB(config={'host': config['default'].MONGO_HOST, 'port': config['default'].MONGO_PORT, 'username': config['default'].MONGO_USERNAME, 'password': config['default'].MONGO_PASSWORD})
+    db = RevisionDB()
     #instantiate a new QueryHandler to get execute the corresponding function
     handler = QueryHandler(db=db)
     number = handler.get_mode(values,mode_attribute)
