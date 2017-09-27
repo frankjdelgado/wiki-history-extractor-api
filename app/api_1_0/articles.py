@@ -3,6 +3,7 @@ import urlparse
 from bson import json_util
 from . import api, filter_params
 from vendors.db_connector import RevisionDB
+from vendors.query_handler import QueryHandler
 from config import config, Config
 from manage import auto
 
@@ -27,11 +28,17 @@ def articles():
     page = request.args.get('page', 1, int)
     page_size = request.args.get('page_size', 20, int)
     query = filter_params(request)
-
     db = RevisionDB(config={'host': config['default'].MONGO_HOST, 'port': config['default'].MONGO_PORT, 'username': config['default'].MONGO_USERNAME, 'password': config['default'].MONGO_PASSWORD})
-
+    handler = QueryHandler(db=db)
+    query = handler.get_articles_query(query)
+    revisions=db.articles(query, page, page_size)
+    articles=[]
+    for rev in revisions:
+        rev['first_extraction_date']= rev['first_extraction_date'].isoformat()
+        rev['last_extraction_date']= rev['last_extraction_date'].isoformat()
+        articles.append(rev)
     return Response(
-        json_util.dumps(db.articles(query, page, page_size)),
+        json_util.dumps(articles),
         mimetype='application/json'
     )
 

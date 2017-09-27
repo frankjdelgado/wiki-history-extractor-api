@@ -39,9 +39,11 @@ class RevisionDB(object):
                 query[term] = ObjectId(query[term]) 
 
         if page==None or per_page==None:
-            return self.db.articles.find(query)
+            articles= self.db.articles.find(query)
         else:
-            return self.db.articles.find(query).skip((page-1)*per_page).limit(per_page)
+            articles= self.db.articles.find(query).skip((page-1)*per_page).limit(per_page)
+
+        return articles
 
     def article(self,query={}):
         return self.db.articles.find_one(query)

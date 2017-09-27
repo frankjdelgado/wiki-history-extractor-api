@@ -23,7 +23,7 @@ class QueryHandler(object):
         return data
 
 
-    def filter_by_date(self,values):
+    def filter_by_date(self,values,name='timestamp'):
         date_format = '%Y-%m-%d'
         #values is a list composed by 1 or 2 values: 
         # date arguments must be in format: YYYY-MM-DD
@@ -37,7 +37,7 @@ class QueryHandler(object):
             date_i=datetime.datetime.strptime(values[0],date_format)
             #it is used 2 dates to extract the revision for the whole day, from 0:0 to 23:59
             date_f=date_i.replace(hour=23,minute=59,second=59)
-            data={'timestamp': {'$gte':date_i , '$lte':date_f} }
+            data={name: {'$gte':date_i , '$lte':date_f} }
             return data
         elif len(values) == 2:
             #if the second argument is a date:
@@ -46,18 +46,18 @@ class QueryHandler(object):
                 date_f=datetime.datetime.strptime(values[1],date_format)
                 #the date values are adjusted to take into account the day until 23:59
                 date_f=date_f.replace(hour=23,minute=59,second=59)
-                data={'timestamp': {'$gte':date_i , '$lte':date_f} }
+                data={name: {'$gte':date_i , '$lte':date_f} }
                 return data
             else:
                 if values[1] == 1:
                     date=datetime.datetime.strptime(values[0],date_format)
-                    data={'timestamp': {'$gte':date} }
+                    data={name: {'$gte':date} }
                     return data
                 else:
                     date=datetime.datetime.strptime(values[0],date_format)
                     #the date values are adjusted to take into account the day until 23:59
                     date=date.replace(hour=23,minute=59,second=59)
-                    data={'timestamp': {'$lte':date} }
+                    data={name: {'$lte':date} }
                     return data
 
 
@@ -97,6 +97,10 @@ class QueryHandler(object):
                     else:
                         if 'size' in arguments:
                             query.update(self.filter_by_size([ arguments.get('size') , value]))
+
+            elif key in ('first_extraction_date','last_extraction_date'):
+                query.update(self.filter_by_date([value],key))
+
             else:
                 query.update({ key : value })
 
@@ -193,3 +197,9 @@ class QueryHandler(object):
             print 'No revisions found'
             return []
 
+    def get_articles_query(self,arguments):
+        data=self.filter_by(arguments)
+        if data!='':
+            return data
+        else:
+            return {}
