@@ -4,7 +4,7 @@ whitelists = {
 	'api.avg':['title','pageid','user','userid','tag','size','sizematch','date','datestart','dateend'],
 	'api.mode':['title','pageid','user','userid','tag','size','sizematch','date','datestart','dateend'],
 	'api.articles': ['title','ns','first_extraction_date','last_extraction_date','last_revision_extracted'],
-	'mode_attributes':['title','user','size','userid','date']
+	'mode_attributes':['title','pageid' ,'user','userid','size','userid','date']
 }
 
 param_type = {
