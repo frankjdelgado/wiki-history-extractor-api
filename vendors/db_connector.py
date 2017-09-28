@@ -3,6 +3,7 @@ import json
 from datetime import datetime
 from bson.objectid import ObjectId
 from config import config, Config
+from vendors.query_handler import QueryHandler
 
 class RevisionDB(object):
     default_config={'host': config['default'].MONGO_HOST, 'port': config['default'].MONGO_PORT, 'username': config['default'].MONGO_USERNAME, 'password': config['default'].MONGO_PASSWORD}   
@@ -23,10 +24,9 @@ class RevisionDB(object):
         return self.db
 
     def revisions(self, query={}, page=None, per_page=None):
-        
-        for term in query:
-            if term == "_id":
-                query[term] = ObjectId(query[term]) 
+        query = QueryHandler(db=self.db).get_query(query)
+        if "_id" in query:
+            query["_id"] = ObjectId(query["_id"])
 
         if page==None or per_page==None:
             revisions= self.db.revisions.find(query)
@@ -42,9 +42,9 @@ class RevisionDB(object):
 
     
     def articles(self, query={}, page=None, per_page=None):
-        for term in query:
-            if term == "_id":
-                query[term] = ObjectId(query[term]) 
+        query = QueryHandler(db=self.db).get_query(query)
+        if "_id" in query:
+            query["_id"] = ObjectId(query["_id"])
 
         if page==None or per_page==None:
             articles= self.db.articles.find(query)
