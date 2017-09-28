@@ -23,15 +23,20 @@ class RevisionDB(object):
     def db():
         return self.db
 
-    def revisions(self, query={}, page=None, per_page=None):
+    def revisions(self, query={}, page=None, per_page=None, sort=1):
         query = QueryHandler(db=self.db).get_query(query)
         if "_id" in query:
             query["_id"] = ObjectId(query["_id"])
 
+        if sort == 'asc':
+            sort = 1
+        elif sort == 'desc':
+            sort = -1
+
         if page==None or per_page==None:
-            revisions= self.db.revisions.find(query)
+            revisions= self.db.revisions.find(query).sort('timestamp', sort)
         else:
-            revisions= self.db.revisions.find(query).skip((page-1)*per_page).limit(per_page)
+            revisions= self.db.revisions.find(query).skip((page-1)*per_page).limit(per_page).sort('timestamp', sort)
 
         result=[]
         for rev in revisions:
@@ -39,7 +44,6 @@ class RevisionDB(object):
             rev['extraction_date']=rev['extraction_date'].isoformat()
             result.append(rev)
         return result
-
     
     def articles(self, query={}, page=None, per_page=None):
         query = QueryHandler(db=self.db).get_query(query)
