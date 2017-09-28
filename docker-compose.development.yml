@@ -17,20 +17,18 @@ services:
           - 'wiki_rabbit:/data'
 
     mongo:
-        build: ./environments/light/mongo
+        image: mongo:3.4.7
         restart: always
-        environment:
-            MONGO_ROLE: primary
-            MONGO_ROOT_USER: wikiadmin
-            MONGO_ROOT_PASSWORD: wikiadmin123
-            MONGO_APP_USER: wiki
-            MONGO_APP_PASSWORD: wiki123
-            MONGO_APP_DATABASE: wiki_history_extractor
-        tty: true
         hostname: mongo
-        stdin_open: true
+        environment:
+            - MONGO_INITDB_ROOT_USERNAME=wiki
+            - MONGO_INITDB_ROOT_PASSWORD=wiki123
+        ports:
+            - 27018:27017
         networks:
             - wiki_network
+        volumes:
+            - 'wiki_mongo:/data/db'
 
     nginx:
         image: nginx:1.13.3
