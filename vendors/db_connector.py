@@ -2,10 +2,11 @@ from pymongo import MongoClient
 import json
 from datetime import datetime
 from bson.objectid import ObjectId
+from config import config, Config
+from vendors.query_handler import QueryHandler
 
 class RevisionDB(object):
-    
-    default_config = {'host': 'localhost', 'port': 27017, 'username': '', 'password': ''}
+    default_config={'host': config['default'].MONGO_HOST, 'port': config['default'].MONGO_PORT, 'username': config['default'].MONGO_USERNAME, 'password': config['default'].MONGO_PASSWORD}   
     db = None
     client = None
     per_page = 20
@@ -23,34 +24,50 @@ class RevisionDB(object):
         return self.db
 
     def revisions(self, query={}, page=None, per_page=None, sort=1):
-        
-        for term in query:
-            if term == "_id":
-                query[term] = ObjectId(query[term]) 
+        query = QueryHandler(db=self.db).get_query(query)
+        if "_id" in query:
+            query["_id"] = ObjectId(query["_id"])
 
         if sort == 'asc':
             sort = 1
         elif sort == 'desc':
             sort = -1
 
-
         if page==None or per_page==None:
-            return self.db.revisions.find(query).sort('timestamp', sort)
+            revisions= self.db.revisions.find(query).sort('timestamp', sort)
         else:
-            return self.db.revisions.find(query).skip((page-1)*per_page).limit(per_page).sort('timestamp', sort)
+            revisions= self.db.revisions.find(query).skip((page-1)*per_page).limit(per_page).sort('timestamp', sort)
+
+        result=[]
+        for rev in revisions:
+            rev['timestamp']=rev['timestamp'].isoformat()
+            rev['extraction_date']=rev['extraction_date'].isoformat()
+            result.append(rev)
+        return result
     
     def articles(self, query={}, page=None, per_page=None):
-        for term in query:
-            if term == "_id":
-                query[term] = ObjectId(query[term]) 
+        query = QueryHandler(db=self.db).get_query(query)
+        if "_id" in query:
+            query["_id"] = ObjectId(query["_id"])
 
         if page==None or per_page==None:
-            return self.db.articles.find(query)
+            articles= self.db.articles.find(query)
         else:
-            return self.db.articles.find(query).skip((page-1)*per_page).limit(per_page)
+            articles= self.db.articles.find(query).skip((page-1)*per_page).limit(per_page)
+
+        result=[]
+        for rev in articles:
+            rev['first_extraction_date']= rev['first_extraction_date'].isoformat()
+            rev['last_extraction_date']= rev['last_extraction_date'].isoformat()
+            result.append(rev)
+
+        return result
 
     def article(self,query={}):
-        return self.db.articles.find_one(query)
+        art=self.db.articles.find_one(query)
+        art['first_extraction_date']= art['first_extraction_date'].isoformat()
+        art['last_extraction_date']= art['last_extraction_date'].isoformat()
+        return art
         
     def last_revs(self):
         cursor= self.db.articles.find({},{'last_extraction_date':1 ,'pageid':1, '_id':0})

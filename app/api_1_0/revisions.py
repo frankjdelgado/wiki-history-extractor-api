@@ -39,11 +39,10 @@ def revisions():
     page_size = request.args.get('page_size', 20, int)
     sort = request.args.get('sort', 'asc')
     query = filter_params(request)
-    
     db = RevisionDB(config={'host': config['default'].MONGO_HOST, 'port': config['default'].MONGO_PORT, 'username': config['default'].MONGO_USERNAME, 'password': config['default'].MONGO_PASSWORD})
-
+    revisions=db.revisions(query, page, page_size)
     return Response(
-        json_util.dumps(db.revisions(query, page, page_size, sort)),
+        json_util.dumps(revisions),
         mimetype='application/json'
     )
 

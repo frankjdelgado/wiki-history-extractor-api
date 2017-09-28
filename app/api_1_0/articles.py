@@ -27,11 +27,10 @@ def articles():
     page = request.args.get('page', 1, int)
     page_size = request.args.get('page_size', 20, int)
     query = filter_params(request)
-
     db = RevisionDB(config={'host': config['default'].MONGO_HOST, 'port': config['default'].MONGO_PORT, 'username': config['default'].MONGO_USERNAME, 'password': config['default'].MONGO_PASSWORD})
-
+    articles=db.articles(query, page, page_size)
     return Response(
-        json_util.dumps(db.articles(query, page, page_size)),
+        json_util.dumps(articles),
         mimetype='application/json'
     )
 
