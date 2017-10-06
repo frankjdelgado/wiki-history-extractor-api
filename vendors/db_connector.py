@@ -109,6 +109,12 @@ class RevisionDB(object):
         cursor = cursor.sort('revid', -1).limit(1)
         return cursor
 
+    def get_nth_revision_date(self,title,projection={'timestamp':1,'revid':1,'_id':0},n):
+        revisions = self.db.revisions.find({'title':title},projection).limit(n)
+        revision = revisions.sort('timestamp', -1).limit(1)
+        for rev in revision:
+            return rev['timestamp']
+
     def remove(self):
         revisions = self.db.revisions.remove({})
         return revisions
@@ -136,5 +142,6 @@ class RevisionDB(object):
         revision["pageid"] = article["pageid"]
         revision["title"] = article["title"]
         return revision
+
 
 
