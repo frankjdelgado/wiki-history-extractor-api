@@ -109,7 +109,7 @@ class RevisionDB(object):
         cursor = cursor.sort('revid', -1).limit(1)
         return cursor
 
-    def get_nth_revision_date(self,title,projection={'timestamp':1,'revid':1,'_id':0},n):
+    def get_nth_revision_date(self,title,n,projection={'timestamp':1,'revid':1,'_id':0}):
         revisions = self.db.revisions.find({'title':title},projection).limit(n)
         revision = revisions.sort('timestamp', -1).limit(1)
         for rev in revision:

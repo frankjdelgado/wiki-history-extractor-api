@@ -4,6 +4,10 @@ from math import factorial, exp
 from config import config, Config
 from vendors.db_connector import RevisionDB
 from app.tasks.app_tasks import extract_article
+import os
+
+env_name = os.getenv('FLASK_CONFIG') or 'default'
+
 
 # Based on wikimetrics ucv formula
 # t0: last time the article was updated
@@ -37,8 +41,10 @@ def calculate_v2(last_date,nth_date,amount_revisions):
 	#if the time that has passed between the current time and the date of last revision is greater than the expected value
 	#the article shold be revisited
 	if time_since_last_revision > expected_value:
+		#print 'True'
 		return True
 	else:
+		#print 'False'
 		return False
 
 def poisson(k, mean):
@@ -96,17 +102,19 @@ def last_revision(pageid):
 # Loop through every article
 # check if a article needs to be revisited
 # extract data. add it to celery queue
-def check_revisions(db):
+def check_revisions(connection):
 
 	# get total amount of articles
-	n_articles = db.articles().count()
+	#n_articles = len(db.articles())
+	n_articles = connection.db.articles.count()
+	#n_articles = connection.db
 	# get cunks of 100 items per query
 	per_page = 100
 
 	# total amoint of iterations
 	total = 1 + n_articles/per_page
 
-	for page in xrange(1, total):
+	for page in xrange(1, total+1):
 
 		# Get last revision of every article. Paginate on chunks of 100
 		pipe = [
@@ -114,8 +122,7 @@ def check_revisions(db):
 			{'$skip': (page-1)*per_page},
 			{'$limit': per_page},
 		]
-		cursor = db.revisions().aggregate(pipeline=pipe)
-		last_rev= db.find_last_rev()
+		cursor = connection.db.revisions.aggregate(pipeline=pipe)
 		for document in cursor: 
 		 	
 		 	# Set revision date to YYYY-MM-DD 00:00:00
@@ -126,29 +133,29 @@ def check_revisions(db):
 			#date_integer = int(time.mktime(date.timetuple()))
 
 			#get total number of revisions for an article
-			total_revisions= db.revisions().find({'title':document['_id']}).count()
+			total_revisions= connection.db.revisions.find({'title':document['_id']}).count()
 
 			#get 10% of total_revisions or 20, whichever is greater
 			if total_revisions < 20:
 				amount_revisions= total_revisions
 			else:
-				amount_revisions=max(20,total_revisions*0.1)
+				amount_revisions=int(max(20,total_revisions*0.1))
 
 			#take the date of the nth revision, base of the amount_revisions, to calculate how much time has passed
 			nth_date=db.get_nth_revision_date(title=document['_id'],n=amount_revisions)
 			#nth_date_integer= int(time.mktime(nth_date.timetuple()))
 
 			# Verify if article should be revisited
-			should_revisit = calculate_v1(date,nth_date,amount_revisions)
+			should_revisit = calculate_v2(date,nth_date,amount_revisions)
 			
 			if should_revisit:
 				# Revisit article. Extract revisions. Add to celery queue
 				extract_article.delay(document['_id'])
 
-db = RevisionDB(config={'host': config['default'].MONGO_HOST, 'port': config['default'].MONGO_PORT, 'username': config['default'].MONGO_USERNAME, 'password': config['default'].MONGO_PASSWORD})
-
+db = RevisionDB(config={'host': config[env_name].MONGO_HOST, 'port': config[env_name].MONGO_PORT, 'username': config[env_name].MONGO_USERNAME, 'password': config[env_name].MONGO_PASSWORD})
 # Run algorithm
 check_revisions(db)
+#print config
 #date1=datetime(2015, 7, 14, 12, 30)
 #date2=datetime(2017, 7, 14, 12, 30)
 #calculate_v2(date2,date1,9)
