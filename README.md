@@ -68,8 +68,9 @@ A custom API to extract and display wikipedia article revisions. Provide custom 
 	* Generate `docker-compose.yml` file: `cp docker-compose.development.yml docker-compose.yml`
 		* Use `docker-compose.replicas.yml` if you want to use a mongodb service with replicas and shards
 	* `docker-compose up --scale worker=2`
-		* You can setup `worker` with the number of containers that you like
+		* You can setup `worker` with the number of containers that you like if you want more than one background worker. Ignore the worker parameter if you just need one worker
 		* If using you are using `docker-compose.replicas.yml`, run `environment/mongo/init_docker.sh`
+	* run `./environments/mongo/create_user.sh` the first time you run the app.
 	* Go to `localhost/api/v1/`
 
 ### Endpoints
