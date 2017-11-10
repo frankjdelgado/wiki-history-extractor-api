@@ -21,11 +21,11 @@ def hello(self):
 
 
 @celery.task(bind=True)
-def extract_article(self, title):
+def extract_article(self, title, locale='en', pageid=None):
 
     db = RevisionDB(config={'host': config['default'].MONGO_HOST, 'port': config['default'].MONGO_PORT, 'username': config['default'].MONGO_USERNAME, 'password': config['default'].MONGO_PASSWORD})
 
-    extractor = RevisionExtractor(payload={'titles': title},title=title, db=db)
+    extractor = RevisionExtractor(payload={'titles': title}, title=title, db=db, locale=locale, pageid=pageid)
     total = extractor.get_all(self)
 
     return {'status': 'Task completed!',
