@@ -3,6 +3,8 @@ from flask import Flask
 from celery import Celery
 from config import config, Config
 from vendors.db_connector import RevisionDB
+from flask_cors import CORS
+
 import os
 
 env_name = os.getenv('FLASK_CONFIG') or 'default'
@@ -10,6 +12,7 @@ celery = Celery(__name__, backend=config[env_name].CELERY_RESULT_BACKEND, broker
 
 def create_app(config_name):
     app = Flask(__name__)
+    CORS(app)
     app.config.from_object(config[config_name])
     config[config_name].init_app(app)
     config['default'] = config[config_name]
