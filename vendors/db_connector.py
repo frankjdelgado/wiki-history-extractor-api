@@ -81,6 +81,8 @@ class RevisionDB(object):
 
             #Format adata
             revision = self.format_raw_revision(revision, article)
+            revision['locale'] = article['locale']
+
 
             self.db.revisions.update({'revid': revision['revid']}, revision, upsert=True)
         return True

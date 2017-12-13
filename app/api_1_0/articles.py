@@ -22,6 +22,7 @@ def articles():
     - first_extraction_date
     - last_extraction_date
     - last_revision_extracted
+    - locale
     '''
 
     page = request.args.get('page', 1, int)
