@@ -45,7 +45,7 @@ class RevisionExtractor(object):
             pageid= response["query"]["pages"][data[0]]["pageid"]
             return pageid
 
-    def get_article(self):
+    def get_article(self, locale='en'):
         payload = {
             'action': 'query',
             'format': 'json',
@@ -65,17 +65,19 @@ class RevisionExtractor(object):
 
                 article["first_extraction_date"] = datetime.now()
                 article["last_extraction_date"] = datetime.now()
-                article["last_revision_extracted"]= self.find_last_revid()
+                article["last_revision_extracted"] = self.find_last_revid()
+                article["locale"] = locale
                 return self.db.db.articles.insert(article)
             else:
                 article["last_extraction_date"] = datetime.now()
-                article["last_revision_extracted"]= self.find_last_revid()
+                article["last_revision_extracted"] = self.find_last_revid()
+                article["locale"] = locale
                 self.db.db.articles.update({'pageid': article["pageid"]}, {"$set": article}, upsert=False)
         else:
             return r.raise_for_status()
 
 
-    def get_all(self, celery_status=None):
+    def get_all(self, celery_status=None, locale='en'):
 
         # Get the last revision extracted allocated in the DB
         self.revendid = self.find_last_revid()
@@ -85,7 +87,7 @@ class RevisionExtractor(object):
 
         total_revisions = 0
 
-        batch = self.get_one(1)
+        batch = self.get_one(1, locale)
         
         if batch == False:
             return total_revisions
@@ -99,7 +101,7 @@ class RevisionExtractor(object):
         while ("continue" in batch):
             time.sleep(self.wait_time)
             self.payload.update({'rvcontinue': batch["continue"]["rvcontinue"]})
-            batch = self.get_one()
+            batch = self.get_one(1, locale)
 
             if celery_status != None:
                 if batch == False:
@@ -113,10 +115,10 @@ class RevisionExtractor(object):
                 # Update status
                 celery_status.update_state(state='IN PROGRESS', meta={
                                            'status': "%d revisions extracted" % (total_revisions)})
-        self.get_article()
+        self.get_article(locale)
         return total_revisions
 
-    def get_one(self,get_article=None):
+    def get_one(self,get_article=None,locale='en'):
         if self.url != None:
             r = requests.get(self.url, params=self.payload)
             if r.status_code == requests.codes.ok:
@@ -129,12 +131,13 @@ class RevisionExtractor(object):
                 article = {
                     'pageid': response["query"]["pages"][ks[0]]["pageid"],
                     'title': response["query"]["pages"][ks[0]]["title"],
+                    'locale': locale
                 }
                 if self.save(data, article) == False:
                     return False
                 #if get_article flag is set, get_article is called
                 if get_article != None:
-                    self.get_article()
+                    self.get_article(locale)
 
                 return response
             else:

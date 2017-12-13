@@ -1,9 +1,9 @@
 whitelists = {
-	'api.revisions': ['comment','anon','pageid','tags','timestamp','userid','revid','contentformat','contentmodel','extraction_date','parentid','title','_id','size','user','minor'],
+	'api.revisions': ['locale','comment','anon','pageid','tags','timestamp','userid','revid','contentformat','contentmodel','extraction_date','parentid','title','_id','size','user','minor'],
 	'api.count':['title','pageid','user','userid','tag','size','sizematch','date','datestart','dateend'],
 	'api.avg':['title','pageid','user','userid','tag','size','sizematch','date','datestart','dateend'],
 	'api.mode':['title','pageid','user','userid','tag','size','sizematch','date','datestart','dateend'],
-	'api.articles': ['title','ns','first_extraction_date','last_extraction_date','last_revision_extracted'],
+	'api.articles': ['locale','title','ns','first_extraction_date','last_extraction_date','last_revision_extracted'],
 	'mode_attributes':['title','pageid' ,'user','userid','size','userid','date']
 }
 
