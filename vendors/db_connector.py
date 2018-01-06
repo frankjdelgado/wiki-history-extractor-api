@@ -23,6 +23,12 @@ class RevisionDB(object):
     def db():
         return self.db
 
+    def mapreduce(self, collection='revisions', map=None, reduce=None, full_response=False, query={}):
+        if collection == 'revisions':
+            return self.db.revisions.map_reduce(map, reduce, full_response=full_response, query=query)
+        else:
+            return self.db.articles.map_reduce(map, reduce, full_response=full_response, query=query)
+
     def aggregate(self, collection='revisions', pipeline=[]):
         if collection == 'revisions':
             return self.db.revisions.aggregate(pipeline)

@@ -8,6 +8,7 @@ from app.tasks.app_tasks import count_task, avg_task, mode_task
 from manage import auto
 from vendors.db_connector import RevisionDB
 from config import config, Config
+from bson.code import Code
 
 def conditions_query(arguments):
     if len(arguments) < 1:
@@ -23,6 +24,33 @@ def conditions_query(arguments):
 
     return None
 
+
+@api.route('/mapreduce', methods=['POST'])
+@auto.doc()
+def mapreduce():
+    '''
+    Use a json payload to query map reduce results
+    
+    - collection. Collection name
+    - map. map function code.
+    - reduce. reduce function code. 
+    '''
+
+    collection = request.args.get('collection', 'revisions')
+    full_response = request.args.get('full_response', False)
+    db = RevisionDB(config={'host': config['default'].MONGO_HOST, 'port': config['default'].MONGO_PORT, 'username': config['default'].MONGO_USERNAME, 'password': config['default'].MONGO_PASSWORD})
+
+    query = request.get_json(silent=True)
+
+    map_code = Code(request.args.get('map'))
+    reduce_code = Code(request.args.get('reduce'))
+
+    result = db.mapreduce(collection, map_code, reduce_code, full_response, query)
+    
+    return Response(
+        json_util.dumps(result),
+        mimetype='application/json'
+    )
 
 @api.route('/query', methods=['POST'])
 @auto.doc()
