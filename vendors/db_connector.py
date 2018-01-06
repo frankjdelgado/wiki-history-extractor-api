@@ -23,6 +23,13 @@ class RevisionDB(object):
     def db():
         return self.db
 
+    def aggregate(self, collection='revisions', pipeline=[]):
+        if collection == 'revisions':
+            return self.db.revisions.aggregate(pipeline)
+        else:
+            return self.db.articles.aggregate(pipeline)
+
+
     def revisions(self, query={}, page=None, per_page=None, sort=1):
         query = QueryHandler(db=self.db).get_query(query)
         if "_id" in query:
