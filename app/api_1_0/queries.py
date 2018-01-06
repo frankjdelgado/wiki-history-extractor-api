@@ -58,7 +58,11 @@ def query():
     '''
     Use a json payload to query the collections using the mongoDB aggregate function
     
+    Params:
     - collection. Collection name. Defaults to 'revisions'. Example: ?collection=articles
+    
+    Json Payload Example:
+    [{"$match":{"pageid":4606}}]
     '''
 
     collection = request.args.get('collection', 'revisions')
