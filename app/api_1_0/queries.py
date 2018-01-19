@@ -60,19 +60,33 @@ def query():
     
     Params:
     - collection. Collection name. Defaults to 'revisions'. Example: ?collection=articles
-    
-    * Use format: '%Y-%m-%dT%H:%M:%S'
-    
+    - date_format. Column date format. Defaults to %Y-%m-%dT%H:%M:%S. Example: ?date_Format=%Y-%m-%dT%H:%M:%S
+        
     Json Payload Example:
-    [{"$match":{"pageid":4606}}]
+    [
+        { 
+            "$match": { 
+                "extraction_date": "2017-09-28T02:36:33.452000",
+                "pageid": 4606
+            }
+        },
+        { 
+            "$project" :{ 
+                "pageid": 1 , "timestamp" : 1
+            } 
+            
+        },
+       { "$limit" : 5 }
+    ]
     '''
 
     collection = request.args.get('collection', 'revisions')
+    date_format = request.args.get('date_format', '%Y-%m-%dT%H:%M:%S')
     db = RevisionDB(config={'host': config['default'].MONGO_HOST, 'port': config['default'].MONGO_PORT, 'username': config['default'].MONGO_USERNAME, 'password': config['default'].MONGO_PASSWORD})
 
     pipeline = request.get_json(silent=True)
     
-    result = db.aggregate(collection, pipeline)
+    result = db.aggregate(collection, pipeline, date_format)
     return Response(
         json_util.dumps(result),
         mimetype='application/json'
