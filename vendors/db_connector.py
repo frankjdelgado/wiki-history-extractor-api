@@ -39,10 +39,6 @@ class RevisionDB(object):
                             if operator in item["$match"][column]:
                                 item["$match"][column][operator] = datetime.strptime(item["$match"][column][operator],date_format)
                         if type(item["$match"][column]) is not dict:
-                            print '*******'
-                            print item["$match"][column]
-                            print type(item["$match"][column])
-                            print '*******'
                             item["$match"][column] = datetime.strptime(item["$match"][column],date_format)
   
         if collection == 'revisions':
