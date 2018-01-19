@@ -17,7 +17,7 @@ services:
           - 'wiki_rabbit:/data'
 
     mongo:
-        image: mongo:3.4.7
+        image: mongo:3.6.2
         restart: always
         hostname: mongo
         environment:

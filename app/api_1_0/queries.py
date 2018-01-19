@@ -61,6 +61,8 @@ def query():
     Params:
     - collection. Collection name. Defaults to 'revisions'. Example: ?collection=articles
     
+    * Use format: '%Y-%m-%dT%H:%M:%S'
+    
     Json Payload Example:
     [{"$match":{"pageid":4606}}]
     '''
