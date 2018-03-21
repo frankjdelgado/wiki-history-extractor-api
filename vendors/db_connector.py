@@ -6,7 +6,7 @@ from config import config, Config
 from vendors.query_handler import QueryHandler
 
 class RevisionDB(object):
-    default_config={'host': config['default'].MONGO_HOST, 'port': config['default'].MONGO_PORT, 'username': config['default'].MONGO_USERNAME, 'password': config['default'].MONGO_PASSWORD}   
+    default_config={'host': config['default'].MONGO_HOST, 'port': config['default'].MONGO_PORT, 'username': config['default'].MONGO_USERNAME, 'password': config['default'].MONGO_PASSWORD, 'db_name':config['default'].MONGO_DB_NAME}   
     db = None
     client = None
     per_page = 20
@@ -16,18 +16,19 @@ class RevisionDB(object):
             config = self.default_config
             
         self.client = MongoClient(config['host'],int(config['port']),connect=False)
-        
-        if self.client.wiki_history_extractor.authenticate(config['username'], config['password']) == True :
-            self.db = self.client.wiki_history_extractor
+        dbname=config['db_name']
+#        print dbname
+        if self.client[dbname].authenticate(config['username'], config['password']) == True :
+            self.db = self.client[dbname]
 
     def db():
         return self.db
 
-    def mapreduce(self, collection='revisions', map=None, reduce=None, full_response=False, query={}):
+    def mapreduce(self, out, collection='revisions', map=None, reduce=None, full_response=False, query={} ):
         if collection == 'revisions':
-            return self.db.revisions.map_reduce(map, reduce, full_response=full_response, query=query)
+            return self.db.revisions.map_reduce(map, reduce, out=out ,full_response=full_response, query=query)
         else:
-            return self.db.articles.map_reduce(map, reduce, full_response=full_response, query=query)
+            return self.db.articles.map_reduce(map, reduce, out=out, full_response=full_response, query=query)
 
     def aggregate(self, collection='revisions', pipeline=[], date_format='%Y-%m-%dT%H:%M:%S'):
 

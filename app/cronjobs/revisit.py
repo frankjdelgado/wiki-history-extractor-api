@@ -152,7 +152,7 @@ def check_revisions(connection):
 				# Revisit article. Extract revisions. Add to celery queue
 				extract_article.delay(document['_id'])
 
-db = RevisionDB(config={'host': config[env_name].MONGO_HOST, 'port': config[env_name].MONGO_PORT, 'username': config[env_name].MONGO_USERNAME, 'password': config[env_name].MONGO_PASSWORD})
+db = RevisionDB(config={'host': config[env_name].MONGO_HOST, 'port': config[env_name].MONGO_PORT, 'username': config[env_name].MONGO_USERNAME, 'password': config[env_name].MONGO_PASSWORD,'db_name':config[env_name].MONGO_DB_NAME})
 # Run algorithm
 check_revisions(db)
 #print config

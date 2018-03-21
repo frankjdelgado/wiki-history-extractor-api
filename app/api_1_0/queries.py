@@ -38,17 +38,17 @@ def mapreduce():
 
     collection = request.args.get('collection', 'revisions')
     full_response = request.args.get('full_response', False)
-    db = RevisionDB(config={'host': config['default'].MONGO_HOST, 'port': config['default'].MONGO_PORT, 'username': config['default'].MONGO_USERNAME, 'password': config['default'].MONGO_PASSWORD})
-
+    db = RevisionDB(config={'host': config['default'].MONGO_HOST, 'port': config['default'].MONGO_PORT, 'username': config['default'].MONGO_USERNAME, 'password': config['default'].MONGO_PASSWORD, 'db_name':config['default'].MONGO_DB_NAME})
     query = request.get_json(silent=True)
 
     map_code = Code(request.args.get('map'))
     reduce_code = Code(request.args.get('reduce'))
+    out = json_util.dumps({'out':'map_reduce'})
 
-    result = db.mapreduce(collection, map_code, reduce_code, full_response, query)
+    result = db.mapreduce(out, collection, map_code, reduce_code, full_response, query)
     
     return Response(
-        json_util.dumps(result),
+        json_util.dumps(result.find()),
         mimetype='application/json'
     )
 
@@ -82,7 +82,7 @@ def query():
 
     collection = request.args.get('collection', 'revisions')
     date_format = request.args.get('date_format', '%Y-%m-%dT%H:%M:%S')
-    db = RevisionDB(config={'host': config['default'].MONGO_HOST, 'port': config['default'].MONGO_PORT, 'username': config['default'].MONGO_USERNAME, 'password': config['default'].MONGO_PASSWORD})
+    db = RevisionDB(config={'host': config['default'].MONGO_HOST, 'port': config['default'].MONGO_PORT, 'username': config['default'].MONGO_USERNAME, 'password': config['default'].MONGO_PASSWORD, 'db_name':config['default'].MONGO_DB_NAME})
 
     pipeline = request.get_json(silent=True)
     
@@ -123,7 +123,7 @@ def count():
     task= count_task.delay(arguments)
     result=task.get()
     if 'count' in result:
-        return jsonify({'count':result['count']}), 202
+        return jsonify({'count':result['count']}), 200
     else:
         return bad_request("There was an error with the arguments, please check the query.")
 
@@ -159,7 +159,7 @@ def avg():
     task= avg_task.delay(arguments)
     result=task.get()
     if 'avg' in result:
-        return jsonify({'avg':result['avg']}), 202
+        return jsonify({'avg':result['avg']}), 200
     else:
         return bad_request("There was an error with the arguments, please check the query.")
 
@@ -198,7 +198,7 @@ def mode():
     task= mode_task.delay(arguments,mode_attribute)
     result=task.get()
     if 'result' in result:
-        return jsonify({mode_attribute:result['result']}), 202
+        return jsonify({mode_attribute:result['result']}), 200
     else:
         return bad_request("There was an error with the arguments, please check the query.")
 

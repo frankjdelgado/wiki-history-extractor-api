@@ -29,7 +29,10 @@ def extract():
         response.status_code = 400
         return response
 
-    locale = request.args.get('locale')
+    if request.args.get('locale') != None:
+        locale = request.args.get('locale')
+    else:
+        locale='en'
     pageid = request.args.get('pageid')
 
     task = extract_article.delay(title, locale, pageid)

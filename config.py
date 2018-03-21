@@ -23,6 +23,7 @@ class Config:
     MONGO_PORT = 27017
     MONGO_USERNAME = 'wiki'
     MONGO_PASSWORD = 'wiki123'
+    MONGO_DB_NAME = 'wiki_history_extractor'
 
 
     FLASKY_MAIL_SUBJECT_PREFIX = '[Flasky]'
@@ -39,6 +40,11 @@ class DevelopmentConfig(Config):
 
 
 class TestingConfig(Config):
+    MONGO_HOST = 'localhost'
+    MONGO_PORT = 27017
+    MONGO_USERNAME = 'wiki'
+    MONGO_PASSWORD = 'wiki123'
+    MONGO_DB_NAME = 'wiki_history_extractor_test'
     TESTING = True
     WTF_CSRF_ENABLED = False
 
