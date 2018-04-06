@@ -31,33 +31,38 @@ services:
             - 'wiki_mongo:/data/db'
 
     nginx:
+        build: ./docker/nginx
         image: nginx:1.13.3
         restart: always
         links:
             - flask
+            - flower:flower
+            - events:events
         ports:
             - "80:80"
         networks:
           - wiki_network
         volumes:
             - './environments/light/nginx/nginx.conf:/etc/nginx/nginx.conf:ro'
-        environment:
-            - FLASK_CONFIG=docker
         depends_on:
             - flask
             
     flask:
         build: .
+        image: wheapi
         restart: always
         environment:
             - FLASK_CONFIG=docker
             - PYTHONBUFFERED=true
             - FLASK_DEBUG=1
+        command: python manage.py runserver --host 0.0.0.0 --port=3031
+        #command: /usr/local/bin/uwsgi --socket 0.0.0.0:3031 --uid uwsgi --protocol uwsgi --wsgi manage:app --py-autoreload 1
+        #command: /usr/local/bin/uwsgi --socket 0.0.0.0:3031 --uid uwsgi --protocol http --wsgi manage:app --py-autoreload 1
         links:
             - rabbit
             - mongo:mongo
         ports:
-            - '80'
+            - "3031:3031"
         networks:
           - wiki_network
         volumes:
@@ -74,6 +79,32 @@ services:
             - FLASK_CONFIG=docker
             - PYTHONBUFFERED=true
             - FLASK_DEBUG=1
+        links:
+            - rabbit
+            - mongo:mongo
+        networks:
+          - wiki_network
+        depends_on:
+            - rabbit
+            - mongo
+    
+    flower:
+        build: .
+        restart: always
+        command: celery flower -A celery_worker.celery --loglevel=info
+        links:
+            - rabbit
+            - mongo:mongo
+        networks:
+          - wiki_network
+        depends_on:
+            - rabbit
+            - mongo
+    
+    events:
+        build: .
+        restart: always
+        command: celery events -A celery_worker.celery --loglevel=info
         links:
             - rabbit
             - mongo:mongo

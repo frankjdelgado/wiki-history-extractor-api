@@ -1,4 +1,5 @@
 # wiki-history-extractor-api
+
 A custom API to extract and display wikipedia article revisions. Provide custom metrics
 
 ### Recommended Requirements
@@ -13,15 +14,22 @@ A custom API to extract and display wikipedia article revisions. Provide custom 
 ### Development
 
 #### Single Machine
+
 * We recommend the use of `virtualenv`
+ 
 	* `pip install virtualenv`
-	* `cd wiki-history-extractor-api`
+
+    * `cd wiki-history-extractor-api`
+
 	* `virtualenv .`
+
 	* Use `. bin/activate` to be able activate the virtual environment in your current console window. For example:
+
 		* First window:
 			1. `. bin/activate`
 			2. `./run.sh update`
 			3. `./run.sh server`
+
 		* Second window:
 			1. `./run.sh celery`
 
@@ -30,7 +38,7 @@ A custom API to extract and display wikipedia article revisions. Provide custom 
 * Start Celery `./run.sh celery`
 * Create a mongo user.  Example:
 	* Using the terminal, type: `mongo`
-	* Once inside the mongo shell enter the following:
+    * Once inside the mongo shell enter the following:
 	
 		`use wiki_history_extractor`
 	

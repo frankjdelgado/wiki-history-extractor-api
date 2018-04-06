@@ -4,7 +4,7 @@ RUN apk add --no-cache --virtual .build-deps \
     gcc \
     libc-dev \
     linux-headers
-    
+
 RUN pip install uwsgi
 
 COPY requirements.txt /tmp/
