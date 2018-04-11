@@ -18,7 +18,7 @@ def extract():
     - locale. Optional. Example: en
     '''
     pageid = request.args.get('pageid')
-    locale = request.args.get('locale')
+    locale = request.args.get('locale','en')
 
     if request.args.get('title') != None:
         title = request.args.get('title')
