@@ -82,7 +82,7 @@ A custom API to extract and display wikipedia article revisions. Provide custom 
 
   * `sudo -i`
 
-  * ```curl -L https://github.com/docker/compose/releases/download/1.16.1/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose```
+  * ```sudo curl -L https://github.com/docker/compose/releases/download/1.20.1/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose```
 
   * `sudo chmod +x /usr/local/bin/docker-compose`
 
@@ -116,3 +116,9 @@ A custom API to extract and display wikipedia article revisions. Provide custom 
 
 * enter `crontab -e`
 * add line: `0 0 * * * (cd PATH/TO/PROJECT/ROOT/FOLDER/ && python -m app.cronjobs.revisit)`
+
+### Tests
+
+1. `. bin/activate`
+1. `FLASK_CONFIG=testing`
+1. `python -m app.tests.test_api`
