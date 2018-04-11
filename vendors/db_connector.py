@@ -29,7 +29,18 @@ class RevisionDB(object):
         else:
             return self.db.articles.map_reduce(map, reduce, full_response=full_response, query=query)
 
-    def aggregate(self, collection='revisions', pipeline=[]):
+    def aggregate(self, collection='revisions', pipeline=[], date_format='%Y-%m-%dT%H:%M:%S'):
+
+        for item in pipeline:
+            if "$match" in item:
+                for column in ['timestamp','extraction_date','first_extraction_date','last_extraction_date']:
+                    if column in item["$match"]:
+                        for operator in ['$gte','$gt','$lt']:
+                            if operator in item["$match"][column]:
+                                item["$match"][column][operator] = datetime.strptime(item["$match"][column][operator],date_format)
+                        if type(item["$match"][column]) is not dict:
+                            item["$match"][column] = datetime.strptime(item["$match"][column],date_format)
+  
         if collection == 'revisions':
             return self.db.revisions.aggregate(pipeline)
         else:

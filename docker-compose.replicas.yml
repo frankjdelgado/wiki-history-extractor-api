@@ -19,7 +19,7 @@ services:
     mongors1n1:
         container_name: mongors1n1
         hostname: mongors1n1
-        image: mongo:3.4.7
+        image: mongo:3.6.2
         command: mongod --shardsvr --replSet mongors1
         expose:
             - "27018"
@@ -31,7 +31,7 @@ services:
     mongors1n2:
         container_name: mongors1n2
         hostname: mongors1n2
-        image: mongo:3.4.7
+        image: mongo:3.6.2
         command: mongod --replSet mongors1 --dbpath /data/db --oplogSize 16 --shardsvr
         expose:
             - "27018"
@@ -41,7 +41,7 @@ services:
     mongors1n3:
         container_name: mongors1n3
         hostname: mongors1n3
-        image: mongo:3.4.7
+        image: mongo:3.6.2
         command: mongod --replSet mongors1 --dbpath /data/db --oplogSize 16 --shardsvr
         expose:
             - "27018"
@@ -51,7 +51,7 @@ services:
     mongors2n1:
         container_name: mongors2n1
         hostname: mongors2n1
-        image: mongo:3.4.7
+        image: mongo:3.6.2
         command: mongod --replSet mongors2 --dbpath /data/db --oplogSize 16 --shardsvr
         expose:
             - "27018"
@@ -63,7 +63,7 @@ services:
     mongors2n2:
         container_name: mongors2n2
         hostname: mongors2n2
-        image: mongo:3.4.7
+        image: mongo:3.6.2
         command: mongod --replSet mongors2 --dbpath /data/db --oplogSize 16 --shardsvr
         expose:
             - "27018"
@@ -73,7 +73,7 @@ services:
     mongors2n3:
         container_name: mongors2n3
         hostname: mongors2n3
-        image: mongo:3.4.7
+        image: mongo:3.6.2
         command: mongod --replSet mongors2 --dbpath /data/db --oplogSize 16 --shardsvr
         expose:
             - "27018"
@@ -83,7 +83,7 @@ services:
     mongocfg1:
         container_name: mongocfg1
         hostname: mongocfg1
-        image: mongo:3.4.7
+        image: mongo:3.6.2
         command: mongod --dbpath /data/configdb --configsvr --port 27019 --replSet configrs
         expose:
             - "27019"
@@ -95,7 +95,7 @@ services:
     mongocfg2:
         container_name: mongocfg2
         hostname: mongocfg2
-        image: mongo:3.4.7
+        image: mongo:3.6.2
         command: mongod --dbpath /data/configdb --configsvr --port 27019 --replSet configrs
         expose:
             - "27019"
@@ -107,7 +107,7 @@ services:
     mongocfg3:
         container_name: mongocfg3
         hostname: mongocfg3
-        image: mongo:3.4.7
+        image: mongo:3.6.2
         command: mongod --dbpath /data/configdb --configsvr --port 27019 --replSet configrs
         expose:
             - "27019"
@@ -119,7 +119,7 @@ services:
     mongo:
         container_name: mongo
         hostname: mongo
-        image: mongo:3.4.7
+        image: mongo:3.6.2
         depends_on:
             - mongocfg1
             - mongocfg2

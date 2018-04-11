@@ -1,11 +1,8 @@
+import os
 from flask import Flask
-
 from celery import Celery
 from config import config, Config
-from vendors.db_connector import RevisionDB
 from flask_cors import CORS
-
-import os
 
 env_name = os.getenv('FLASK_CONFIG') or 'default'
 celery = Celery(__name__, backend=config[env_name].CELERY_RESULT_BACKEND, broker=config[env_name].CELERY_BROKER_URL,include=[__name__+'.tasks'])
@@ -25,11 +22,5 @@ def create_app(config_name):
 
     from .main import main as main_blueprint
     app.register_blueprint(main_blueprint)
-
-    from .api_1_0 import api as api_1_0_blueprint
-    app.register_blueprint(api_1_0_blueprint, url_prefix='/api/v1')
-
-    #from .api_1_0 import auto
-    #auto.init_app(app)
 
     return app
