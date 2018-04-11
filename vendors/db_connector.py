@@ -17,7 +17,7 @@ class RevisionDB(object):
             
         self.client = MongoClient(config['host'],int(config['port']),connect=False)
         dbname=config['db_name']
-#        print dbname
+        
         if self.client[dbname].authenticate(config['username'], config['password']) == True :
             self.db = self.client[dbname]
 
