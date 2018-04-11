@@ -60,6 +60,14 @@ docker_stop(){
 	docker-compose stop
 }
 
+docker_setup_users(){
+	sh docker/mongo/create_user.sh
+}
+
+docker_setup_nodes(){
+	sh docker/mongo/setup_nodes.sh
+}
+
 do_nothing(){
 	echo "Invalid arguments. Please, try again."
 }
@@ -72,6 +80,8 @@ docker_menu(){
   echo "4. Logs"
   echo "5. Stats"
   echo "6. Stop"
+  echo "7. Setup Mongo Users"
+  echo "8. Setup Mongo Nodes"
   echo ''
   echo -n "Enter an option and press [ENTER]: $option"
 
@@ -101,6 +111,12 @@ docker_menu(){
 	6)
       docker_stop
       ;;
+	7)
+      docker_setup_users
+      ;;
+	8)
+      docker_setup_nodes
+      ;;
 	start)
       docker_start_all
       ;;
@@ -118,6 +134,12 @@ docker_menu(){
       ;;
 	stop)
       docker_stop
+      ;;
+	users)
+      docker_setup_users
+      ;;
+	nodes)
+      docker_setup_nodes
       ;;
     *)
       do_nothing
