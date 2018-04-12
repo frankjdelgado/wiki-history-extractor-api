@@ -6,16 +6,20 @@ from bson import json_util
 from . import api
 from manage import auto
 
-
 @api.route('/extract', methods=['GET', 'POST'])
 @auto.doc()
 def extract():
     '''
     Extract the revisions data from a wiki article. The function can receive the URL or the wiki title.
+
+    Example: <a href="extract?title=RabbitMQ&locale=es" target="_blank">/api/v1/extract?title=RabbitMQ&locale=es</a>
+
     Params:
-    - title. Example: RabbitMQ
-    - url. Example: https://es.wikipedia.org/wiki/RabbitMQ
-    - locale. Optional. Example: en
+    <ul class="params">
+        <li>title: Article Title. <i>Example: RabbitMQ</i></li>
+        <li>url: Article URL. <i>Example: <a href="https://es.wikipedia.org/wiki/RabbitMQ" target="_blank">https://es.wikipedia.org/wiki/RabbitMQ</a></i></li>
+        <li>locale: Article Language <i>(Optional)</i>. <i>Example: en<i/></li>
+    </ul>
     '''
     pageid = request.args.get('pageid')
     locale = request.args.get('locale','en')
