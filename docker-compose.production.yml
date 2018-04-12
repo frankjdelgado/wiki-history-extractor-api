@@ -125,13 +125,10 @@ services:
             - mongors1n1
             - mongors2n1
         command: mongos --configdb configrs/mongocfg1:27019,mongocfg2:27019,mongocfg3:27019
-        environment:
-            - MONGO_INITDB_ROOT_USERNAME=wiki
-            - MONGO_INITDB_ROOT_PASSWORD=wiki123
         ports:
             - 27018:27017
         volumes:
-            - 'wiki_mongos1:/data/db'
+            - 'wiki_mongo:/data/db'
         networks:
             - wiki_network
 
@@ -144,7 +141,6 @@ services:
             - flower:flower
         ports:
             - "80:80"
-            - "8888:8888"
         volumes:
             - './docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro'
             - './docker/nginx/.htpasswd:/etc/nginx/.htpasswd'
@@ -156,11 +152,12 @@ services:
         environment:
             - FLASK_CONFIG=docker
             - PYTHONBUFFERED=true
-            - FLASK_DEBUG=1
         command: /usr/local/bin/uwsgi --socket 0.0.0.0:3031 --uid uwsgi --protocol uwsgi --wsgi manage:app --py-autoreload 1
         links:
             - rabbit
             - mongo:mongo
+        ports:
+            - "3031:3031"
         volumes:
           - '.:/app'
         depends_on:
@@ -194,6 +191,29 @@ services:
         depends_on:
             - rabbit
     
+    adminmongo:
+        hostname: adminmongo
+        image: mrvautin/adminmongo 
+        links:
+            - mongo:mongo
+        environment:
+            - HOST=0.0.0.0
+            - CONN_NAME=wiki
+            - DB_USERNAME=wiki
+            - DB_PASSWORD=wiki123
+            - DB_HOST=mongo
+            - DB_PORT=27017
+            - DB_NAME=wiki_history_extractor
+            - PASSWORD=wiki123
+            - CONTEXT=adminmongo
+        volumes:
+            - './docker/adminmongo/app.json:/app/user/config/app.json'
+
 volumes:
     wiki_rabbit:
     wiki_mongo:
+    wiki_mongors1n1:
+    wiki_mongors2n1:
+    wiki_mongocfg1:
+    wiki_mongocfg2:
+    wiki_mongocfg3:
