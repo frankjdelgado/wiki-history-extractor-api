@@ -25,6 +25,8 @@ pip-selfcheck.json
 
 # Editors
 .vscode
+wiki-api.sublime-project
+wiki-api.sublime-workspace
 
 # Docker
 docker-compose.yml
