@@ -11,8 +11,6 @@ services:
             - RABBITMQ_DEFAULT_PASS=wiki123
         ports:
             - "5673:5672"
-        networks:
-          - wiki_network
         volumes:
           - 'wiki_rabbit:/data'
 
@@ -20,46 +18,40 @@ services:
         image: mongo:3.6.2
         restart: always
         hostname: mongo
-        environment:
-            - MONGO_INITDB_ROOT_USERNAME=wiki
-            - MONGO_INITDB_ROOT_PASSWORD=wiki123
         ports:
             - 27018:27017
-        networks:
-            - wiki_network
         volumes:
             - 'wiki_mongo:/data/db'
 
     nginx:
-        image: nginx:1.13.3
+        hostname: nginx
+        image: nginx:1.13.11-alpine
         restart: always
         links:
-            - flask
+            - flask          
+            - flower:flower
         ports:
             - "80:80"
-        networks:
-          - wiki_network
         volumes:
-            - './environments/light/nginx/nginx.conf:/etc/nginx/nginx.conf:ro'
-        environment:
-            - FLASK_CONFIG=docker
-        depends_on:
-            - flask
+            - './docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro'
+            - './docker/nginx/.htpasswd:/etc/nginx/.htpasswd'
             
     flask:
         build: .
+        image: wheapi
         restart: always
         environment:
             - FLASK_CONFIG=docker
             - PYTHONBUFFERED=true
             - FLASK_DEBUG=1
+        # command: python manage.py runserver --host 0.0.0.0 --port=3031
+        command: /usr/local/bin/uwsgi --socket 0.0.0.0:3031 --uid uwsgi --protocol uwsgi --wsgi manage:app --py-autoreload 1
+        # command: /usr/local/bin/uwsgi --socket 0.0.0.0:3031 --uid uwsgi --protocol http --wsgi manage:app --py-autoreload 1
         links:
             - rabbit
             - mongo:mongo
         ports:
-            - '80'
-        networks:
-          - wiki_network
+            - "3031:3031"
         volumes:
           - '.:/app'
         depends_on:
@@ -67,7 +59,7 @@ services:
             - mongo
     
     worker:
-        build: .
+        image: wheapi
         restart: always
         command: celery worker -A celery_worker.celery --loglevel=info
         environment:
@@ -77,15 +69,42 @@ services:
         links:
             - rabbit
             - mongo:mongo
-        networks:
-          - wiki_network
         depends_on:
             - rabbit
             - mongo
+    
+    flower:
+        hostname: flower
+        image: wheapi
+        restart: always
+        command: flower -A celery_worker.celery --loglevel=info --broker=amqp://wiki:wiki123@rabbit:5672 --url_prefix=flower
+        ports:
+            - "5555:5555"
+        links:
+            - rabbit
+        depends_on:
+            - rabbit
+    
+    adminmongo:
+        hostname: adminmongo
+        image: mrvautin/adminmongo 
+        links:
+            - mongo:mongo
+        ports:
+            - 1234:1234 
+        environment:
+            - HOST=0.0.0.0
+            - CONN_NAME=wiki
+            - DB_USERNAME=wiki
+            - DB_PASSWORD=wiki123
+            - DB_HOST=mongo
+            - DB_PORT=27017
+            - DB_NAME=wiki_history_extractor
+            - PASSWORD=wiki123
+            - CONTEXT=adminmongo
+        volumes:
+            - './docker/adminmongo/app.json:/app/user/config/app.json'
 
 volumes:
     wiki_rabbit:
     wiki_mongo:
-
-networks:
-  wiki_network:

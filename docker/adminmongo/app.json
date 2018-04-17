@@ -1,0 +1,7 @@
+{
+    "app": {
+        "password": "wiki123",
+        "context": "adminmongo",
+        "autoReconnect": true
+    }
+}

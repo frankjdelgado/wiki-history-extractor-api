@@ -22,5 +22,11 @@ include/
 lib/
 local/
 pip-selfcheck.json
+
+# Editors
 .vscode
+
+# Docker
 docker-compose.yml
+environments/
+
