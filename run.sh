@@ -28,7 +28,7 @@ run_events(){
 run_tests(){
 	echo "Start Tests"
   gnome-terminal --working-directory=$(pwd) -x bash -c "source bin/activate; export FLASK_CONFIG=testing; celery worker -A celery_worker.celery --loglevel=info"
-  python -m app.tests.test_api
+  gnome-terminal --working-directory=$(pwd) -x bash -c "source bin/activate; python -m app.tests.test_api;echo 'Press Enter to continue'; read n -n 1"
 }
 
 start_app(){
