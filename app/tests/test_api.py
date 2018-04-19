@@ -1,16 +1,34 @@
 import unittest
 from app import create_app
-#from app import create_app
 from vendors.api_extractor import RevisionExtractor
 import requests
 import json
 import sys
 import time
+from pymongo import MongoClient
+from config import config
+from app.api_1_0 import api as api_1_0_blueprint
 
 class TestWikiApi(unittest.TestCase):
     def setUp(self):
+        client=MongoClient(config['testing'].MONGO_HOST, int(config['testing'].MONGO_PORT),connect=False)
+        dbname=config['testing'].MONGO_DB_NAME
+        users=client[dbname].command("usersInfo", "wiki")
+        if users['users'][0]['user']=='wiki':
+            client[dbname].command("dropUser", "wiki")
+
+        client[dbname].command("createUser", "wiki", pwd="wiki123", roles=["readWrite"])
+
         app = create_app('testing')
+        app.register_blueprint(api_1_0_blueprint, url_prefix='/api/v1')
         self.app= app.test_client()
+
+#    def tearDown(self):
+#        client=MongoClient(config['testing'].MONGO_HOST, int(config['testing'].MONGO_PORT),connect=False)
+#        dbname=config['testing'].MONGO_DB_NAME
+#
+#        client[dbname].command("dropUser", "wiki")
+#        client.drop_database(dbname)
 
     def test_data_extraction(self):
         response = self.app.get('/api/v1/extract?title=Dungeon_Siege')
@@ -102,6 +120,7 @@ class TestWikiApi(unittest.TestCase):
         payload={}
         response = self.app.post('/api/v1/mapreduce?map='+code_map+'&reduce='+code_reduce,data=json.dumps(payload),headers = {'content-type': 'application/json'})
         self.assertEqual(response.status_code, 200)
+
 
 
 
