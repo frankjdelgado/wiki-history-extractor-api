@@ -45,13 +45,19 @@ A custom API to extract and display wikipedia article revisions. Provide custom 
     db.createUser({user: "wiki",pwd: "wiki123",roles: [{ role:    "readWrite", db: "wiki_history_extractor" }]});
     ```
 
-### Multiple Nodes
+### Docker Deployment
 
-* This Docker setup will deplay the following services:
-  * 3 Flask instances using nginx as a server and uwsgi as middleware
-  * 1 Mongo instance (TODO: mongo replicas and shards)
-  * 1 RabbitMQ instance (TODO: rabbitmq cluster)
-  * 1 Nginx Load Balancer
+* For deployment at the UCV labs you will first need to use a VPN
+
+  * Download `<ovpn_file_name>.ovpn`
+
+  * Import the certifcate (double click) `<certificate_name>.crt`
+
+  * `sudo apt-get install openvpn easy-rsa`
+
+  * Start openvpn `sudo openvpn --config <ovpn_file_name>.ovpn`
+
+  * Open a new terminal and connect to the server `ssh <user>@<ip>`
 
 * Install Docker. For detailed instructions please follow this [link](https://docs.docker.com/engine/installation/linux/docker-ce/ubuntu/#install-using-the-repository):
 
@@ -80,20 +86,21 @@ A custom API to extract and display wikipedia article revisions. Provide custom 
 
   * `sudo usermod -aG docker $USER`
 
-  * `sudo -i`
-
   * ```curl -L https://github.com/docker/compose/releases/download/1.16.1/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose```
 
   * `sudo chmod +x /usr/local/bin/docker-compose`
 
-* Run Servers
-  * Generate `docker-compose.yml` file: `cp docker-compose.development.yml docker-compose.yml`
-    * Use `docker-compose.replicas.yml` if you want to use a mongodb service with replicas and shards
-  * `docker-compose up --scale worker=2`
-    * You can setup `worker` with the number of containers that you like if you want more than one background worker. Ignore the worker parameter if you just need one worker
-    * If using you are using `docker-compose.replicas.yml`, run `environments/mongo/init_docker.sh`
-  * run `./environments/mongo/create_user.sh` the first time you run the app.
-    * Go to `localhost/api/v1/`
+  * `cp docker-compose.development.yml docker-compose.yml`
+
+  * `docker-compose build`
+
+  * `docker-compose up -d`
+
+  * `./docker/mongo/create_user.sh`
+
+  * `docker-compose restart`
+
+  * Check the logs using `docker-compose logs`
 
 #### Docs
 
