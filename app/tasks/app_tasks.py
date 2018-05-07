@@ -21,10 +21,23 @@ def hello(self):
 
 
 @celery.task(bind=True)
-def extract_article(self, title, locale='en', pageid=None):
+def extract_article(self, title, locale='en', pageid=None, db=None):
 
-    db = RevisionDB(config={'host': config['default'].MONGO_HOST, 'port': config['default'].MONGO_PORT, 'username': config['default'].MONGO_USERNAME, 'password': config['default'].MONGO_PASSWORD})
+    MONGO_HOST = os.environ.get('MONGO_HOST')
+    MONGO_PORT = int(os.environ.get('MONGO_PORT'))
+    MONGO_USERNAME = os.environ.get('MONGO_USERNAME')
+    MONGO_PASSWORD = os.environ.get('MONGO_PASSWORD')
+    MONGO_DB_NAME = os.environ.get('MONGO_DB_NAME')
 
+    if db == None:
+        db = RevisionDB(config={
+            'host': MONGO_HOST,
+            'port': MONGO_PORT,
+            'username': MONGO_USERNAME,
+            'password': MONGO_PASSWORD,
+            'db_name':MONGO_DB_NAME
+        })
+        
     extractor = RevisionExtractor(payload={'titles': title}, title=title, db=db, locale=locale, pageid=pageid)
     total = extractor.get_all(self, locale=locale)
 
@@ -34,23 +47,23 @@ def extract_article(self, title, locale='en', pageid=None):
 @celery.task(bind=True)
 def clean_revisions(self, title):
 
-    db = RevisionDB(config={'host': config['default'].MONGO_HOST, 'port': config['default'].MONGO_PORT, 'username': config['default'].MONGO_USERNAME, 'password': config['default'].MONGO_PASSWORD})
+    db = RevisionDB(config={'host': config['default'].MONGO_HOST, 'port': config['default'].MONGO_PORT, 'username': config['default'].MONGO_USERNAME, 'password': config['default'].MONGO_PASSWORD, 'db_name':config['default'].MONGO_DB_NAME})
 
     db.find_query({formatted: False})
 
     self.update_state(state='IN PROGRESS', meta={'status': "%d revisions extracted" % (2)})
     return {'status': 'Task completed!',
             'result': "%d revisions extracted" % total}
-            
+
 @celery.task(bind=True)
 def count_task(self,arguments):
 
-    db = RevisionDB(config={'host': config['default'].MONGO_HOST, 'port': config['default'].MONGO_PORT, 'username': config['default'].MONGO_USERNAME, 'password': config['default'].MONGO_PASSWORD})
+    db = RevisionDB(config={'host': config['default'].MONGO_HOST, 'port': config['default'].MONGO_PORT, 'username': config['default'].MONGO_USERNAME, 'password': config['default'].MONGO_PASSWORD, 'db_name':config['default'].MONGO_DB_NAME})
     #instantiate a new QueryHandler to get execute the corresponding function
     handler = QueryHandler(db=db)
     number = handler.get_count(arguments)
     if number!=None:
-        return {'status': 'Task completed!', 
+        return {'status': 'Task completed!',
                 'count': "%d" % number}
     else:
         return {'status': 'Task failed!'}
@@ -58,12 +71,12 @@ def count_task(self,arguments):
 @celery.task(bind=True)
 def avg_task(self,values):
 
-    db = RevisionDB(config={'host': config['default'].MONGO_HOST, 'port': config['default'].MONGO_PORT, 'username': config['default'].MONGO_USERNAME, 'password': config['default'].MONGO_PASSWORD})
+    db = RevisionDB(config={'host': config['default'].MONGO_HOST, 'port': config['default'].MONGO_PORT, 'username': config['default'].MONGO_USERNAME, 'password': config['default'].MONGO_PASSWORD, 'db_name':config['default'].MONGO_DB_NAME})
     #instantiate a new QueryHandler to get execute the corresponding function
     handler = QueryHandler(db=db)
     number = handler.get_avg(values)
     if number!=None:
-        return {'status': 'Task completed!', 
+        return {'status': 'Task completed!',
                 'avg': "%f" % number}
     else:
         return {'status': 'Task failed!'}
@@ -72,12 +85,12 @@ def avg_task(self,values):
 @celery.task(bind=True)
 def mode_task(self,values,mode_attribute):
 
-    db = RevisionDB(config={'host': config['default'].MONGO_HOST, 'port': config['default'].MONGO_PORT, 'username': config['default'].MONGO_USERNAME, 'password': config['default'].MONGO_PASSWORD})
+    db = RevisionDB(config={'host': config['default'].MONGO_HOST, 'port': config['default'].MONGO_PORT, 'username': config['default'].MONGO_USERNAME, 'password': config['default'].MONGO_PASSWORD, 'db_name':config['default'].MONGO_DB_NAME})
     #instantiate a new QueryHandler to get execute the corresponding function
     handler = QueryHandler(db=db)
     number = handler.get_mode(values,mode_attribute)
     if number!=None:
-        return {'status': 'Task completed!', 
+        return {'status': 'Task completed!',
         'result': "%s" % number}
     else:
         return {'status': 'Task failed!'}

@@ -11,7 +11,7 @@ from manage import auto
 def articles():
     '''
     Return list of articles.
-    
+
     Pagination:
     - page: Page number. Defaults to 1. Example: ?page=2
     - page_size: Number of items per page. Defaults to 20, max size of 200. Example: ?page=1&page_size=100
@@ -28,7 +28,7 @@ def articles():
     page = request.args.get('page', 1, int)
     page_size = request.args.get('page_size', 20, int)
     query = filter_params(request)
-    db = RevisionDB(config={'host': config['default'].MONGO_HOST, 'port': config['default'].MONGO_PORT, 'username': config['default'].MONGO_USERNAME, 'password': config['default'].MONGO_PASSWORD})
+    db = RevisionDB(config={'host': config['default'].MONGO_HOST, 'port': config['default'].MONGO_PORT, 'username': config['default'].MONGO_USERNAME, 'password': config['default'].MONGO_PASSWORD, 'db_name':config['default'].MONGO_DB_NAME})
     articles=db.articles(query, page, page_size)
     return Response(
         json_util.dumps(articles),
@@ -40,13 +40,11 @@ def articles():
 @auto.doc()
 def article(page_id):
     '''Return the article for the given pageid.'''
-    
-    db = RevisionDB(config={'host': config['default'].MONGO_HOST, 'port': config['default'].MONGO_PORT, 'username': config['default'].MONGO_USERNAME, 'password': config['default'].MONGO_PASSWORD})
+
+    db = RevisionDB(config={'host': config['default'].MONGO_HOST, 'port': config['default'].MONGO_PORT, 'username': config['default'].MONGO_USERNAME, 'password': config['default'].MONGO_PASSWORD, 'db_name':config['default'].MONGO_DB_NAME})
     query={'pageid':int(page_id)}
     art= db.article(query) or {}
     return Response(
         json_util.dumps(art),
         mimetype='application/json'
     )
-
-
