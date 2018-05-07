@@ -33,8 +33,10 @@ class DevelopmentConfig(Config):
 
 class TestingConfig(Config):
     MONGO_DB_NAME = os.environ.get('MONGO_DB_TEST_NAME') or 'wiki_history_extractor_test'
-    TESTING = True
-    WTF_CSRF_ENABLED = False
+    # TESTING = True
+    # WTF_CSRF_ENABLED = False
+    CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL') or 'amqp://wiki:wiki123@rabbit:5672'
+    CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT_BACKEND') or 'amqp://wiki:wiki123@rabbit:5672'
 
 class ProductionConfig(Config):
     MONGO_HOST = os.environ.get('MONGO_HOST') or 'mongo'

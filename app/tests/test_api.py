@@ -7,6 +7,7 @@ import sys
 import time
 from pymongo import MongoClient
 from config import config
+import os
 from app.api_1_0 import api as api_1_0_blueprint
 
 class TestWikiApi(unittest.TestCase):
@@ -14,12 +15,14 @@ class TestWikiApi(unittest.TestCase):
         client=MongoClient(config['testing'].MONGO_HOST, int(config['testing'].MONGO_PORT),connect=False)
         dbname=config['testing'].MONGO_DB_NAME
         users=client[dbname].command("usersInfo", "wiki")
-        if users['users'][0]['user']=='wiki':
-            client[dbname].command("dropUser", "wiki")
 
-        client[dbname].command("createUser", "wiki", pwd="wiki123", roles=["readWrite"])
+        if len(users['users']) > 0:
+            if users['users'][0]['user']=='wiki':
+                client[dbname].command("dropUser", "wiki")
+        else:
+            client[dbname].command("createUser", "wiki", pwd="wiki123", roles=["readWrite"])
 
-        app = create_app('testing')
+        app = create_app(os.getenv('FLASK_CONFIG') or 'default')
         app.register_blueprint(api_1_0_blueprint, url_prefix='/api/v1')
         self.app= app.test_client()
 
@@ -40,7 +43,7 @@ class TestWikiApi(unittest.TestCase):
         task_link = json.loads(response_task_state.get_data())
         #it is checked the state of the task until is completed
         while task_link['state'] =='PENDING' or task_link['state'] =='IN PROGRESS' :
-            time.sleep(10)
+            time.sleep(1)
             response_task_state = self.app.get(location)
             task_link = json.loads(response_task_state.get_data())
 
@@ -57,11 +60,11 @@ class TestWikiApi(unittest.TestCase):
 
     def test_endpoint_articles(self):
         response = self.app.get('/api/v1/articles')
-        self.assertEqual(response.status_code, 200)        
+        self.assertEqual(response.status_code, 200)
 
     def test_endpoint_article(self):
         response = self.app.get('/api/v1/articles/630354')
-        self.assertEqual(response.status_code, 200)        
+        self.assertEqual(response.status_code, 200)
 
     def test_endpoint_revisions(self):
         response = self.app.get('/api/v1/revisions')
@@ -120,8 +123,6 @@ class TestWikiApi(unittest.TestCase):
         payload={}
         response = self.app.post('/api/v1/mapreduce?map='+code_map+'&reduce='+code_reduce,data=json.dumps(payload),headers = {'content-type': 'application/json'})
         self.assertEqual(response.status_code, 200)
-
-
 
 
 if __name__ == "__main__":

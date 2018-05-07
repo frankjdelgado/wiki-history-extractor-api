@@ -42,4 +42,3 @@ def extract():
 
     task = extract_article.delay(title, locale, pageid)
     return jsonify({'Location': url_for('.task_status',task_id=task.id, name='extract_article', _external=True)}), 202
-

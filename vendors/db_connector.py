@@ -6,7 +6,7 @@ from config import config, Config
 from vendors.query_handler import QueryHandler
 
 class RevisionDB(object):
-    default_config={'host': config['default'].MONGO_HOST, 'port': config['default'].MONGO_PORT, 'username': config['default'].MONGO_USERNAME, 'password': config['default'].MONGO_PASSWORD, 'db_name':config['default'].MONGO_DB_NAME}   
+    default_config={'host': config['default'].MONGO_HOST, 'port': config['default'].MONGO_PORT, 'username': config['default'].MONGO_USERNAME, 'password': config['default'].MONGO_PASSWORD, 'db_name':config['default'].MONGO_DB_NAME}
     db = None
     client = None
     per_page = 20
@@ -14,10 +14,10 @@ class RevisionDB(object):
     def __init__(self, config=None):
         if config == None:
             config = self.default_config
-            
+
         self.client = MongoClient(config['host'],int(config['port']),connect=False)
         dbname=config['db_name']
-        
+
         if self.client[dbname].authenticate(config['username'], config['password']) == True :
             self.db = self.client[dbname]
 
@@ -41,7 +41,7 @@ class RevisionDB(object):
                                 item["$match"][column][operator] = datetime.strptime(item["$match"][column][operator],date_format)
                         if type(item["$match"][column]) is not dict:
                             item["$match"][column] = datetime.strptime(item["$match"][column],date_format)
-  
+
         if collection == 'revisions':
             return self.db.revisions.aggregate(pipeline)
         else:
@@ -69,7 +69,7 @@ class RevisionDB(object):
             rev['extraction_date']=rev['extraction_date'].isoformat()
             result.append(rev)
         return result
-    
+
     def articles(self, query={}, page=None, per_page=None):
         query = QueryHandler(db=self.db).get_query(query)
         if "_id" in query:
@@ -90,10 +90,13 @@ class RevisionDB(object):
 
     def article(self,query={}):
         art=self.db.articles.find_one(query)
-        art['first_extraction_date']= art['first_extraction_date'].isoformat()
-        art['last_extraction_date']= art['last_extraction_date'].isoformat()
+        if art != None:
+            art['first_extraction_date']= art['first_extraction_date'].isoformat()
+
+        if art != None:
+            art['last_extraction_date']= art['last_extraction_date'].isoformat()
         return art
-        
+
     def last_revs(self):
         cursor= self.db.articles.find({},{'last_extraction_date':1 ,'pageid':1, '_id':0})
         cursor=list(cursor)
@@ -169,6 +172,3 @@ class RevisionDB(object):
         revision["pageid"] = article["pageid"]
         revision["title"] = article["title"]
         return revision
-
-
-
