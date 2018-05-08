@@ -28,21 +28,28 @@ services:
         image: nginx:1.13.11-alpine
         restart: always
         links:
-            - flask          
+            - flask
             - flower:flower
         ports:
             - "80:80"
         volumes:
             - './docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro'
             - './docker/nginx/.htpasswd:/etc/nginx/.htpasswd'
-            
+
     flask:
         build: .
         image: wheapi
         restart: always
         environment:
             - FLASK_CONFIG=docker
-            - PYTHONBUFFERED=true
+            - MONGO_HOST=mongo
+            - MONGO_PORT=27017
+            - MONGO_USERNAME=wiki
+            - MONGO_PASSWORD=wiki123
+            - MONGO_DB_NAME=wiki_history_extractor
+            - MONGO_DB_TEST_NAME=wiki_history_extractor_test
+            - CELERY_BROKER_URL=amqp://wiki:wiki123@rabbit:5672
+            - CELERY_RESULT_BACKEND=amqp://wiki:wiki123@rabbit:5672
             - FLASK_DEBUG=1
         # command: python manage.py runserver --host 0.0.0.0 --port=3031
         command: /usr/local/bin/uwsgi --socket 0.0.0.0:3031 --uid uwsgi --protocol uwsgi --wsgi manage:app --py-autoreload 1
@@ -57,7 +64,7 @@ services:
         depends_on:
             - rabbit
             - mongo
-    
+
     worker:
         image: wheapi
         restart: always
@@ -72,7 +79,7 @@ services:
         depends_on:
             - rabbit
             - mongo
-    
+            
     flower:
         hostname: flower
         image: wheapi
@@ -84,14 +91,14 @@ services:
             - rabbit
         depends_on:
             - rabbit
-    
+
     adminmongo:
         hostname: adminmongo
-        image: mrvautin/adminmongo 
+        image: mrvautin/adminmongo
         links:
             - mongo:mongo
         ports:
-            - 1234:1234 
+            - 1234:1234
         environment:
             - HOST=0.0.0.0
             - CONN_NAME=wiki
