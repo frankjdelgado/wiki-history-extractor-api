@@ -5,7 +5,7 @@ from vendors.db_connector import RevisionDB
 from vendors.query_handler import QueryHandler
 from vendors.api_extractor import RevisionExtractor
 import time
-
+import os
 
 @celery.task(bind=True)
 def hello(self):
@@ -37,7 +37,7 @@ def extract_article(self, title, locale='en', pageid=None, db=None):
             'password': MONGO_PASSWORD,
             'db_name':MONGO_DB_NAME
         })
-        
+
     extractor = RevisionExtractor(payload={'titles': title}, title=title, db=db, locale=locale, pageid=pageid)
     total = extractor.get_all(self, locale=locale)
 
