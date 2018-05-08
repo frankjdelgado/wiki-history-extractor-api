@@ -48,7 +48,7 @@ class RevisionDB(object):
             return self.db.articles.aggregate(pipeline)
 
 
-    def revisions(self, query={}, page=None, per_page=None, sort=1):
+    def revisions(self, query={}, page=None, per_page=None, sort=1, project={'locale': 1, 'comment': 1, 'anon': 1, 'pageid': 1, 'tags': 1, 'timestamp': 1, 'userid': 1, 'revid': 1, 'contentformat': 1, 'contentmodel': 1, 'extraction_date': 1, 'parentid': 1, 'title': 1, '_id': 1, 'size': 1}):
         query = QueryHandler(db=self.db).get_query(query)
         if "_id" in query:
             query["_id"] = ObjectId(query["_id"])
@@ -59,41 +59,50 @@ class RevisionDB(object):
             sort = -1
 
         if page==None or per_page==None:
-            revisions= self.db.revisions.find(query).sort('timestamp', sort)
+            revisions= self.db.revisions.find(query, project).sort('timestamp', sort)
         else:
-            revisions= self.db.revisions.find(query).skip((page-1)*per_page).limit(per_page).sort('timestamp', sort)
+            revisions= self.db.revisions.find(query, project).skip((page-1)*per_page).limit(per_page).sort('timestamp', sort)
 
         result=[]
         for rev in revisions:
-            rev['timestamp']=rev['timestamp'].isoformat()
-            rev['extraction_date']=rev['extraction_date'].isoformat()
+
+            if rev and 'timestamp' in rev:
+                rev['timestamp']=rev['timestamp'].isoformat()
+
+            if rev and 'extraction_date' in rev:
+                rev['extraction_date']=rev['extraction_date'].isoformat()
+
             result.append(rev)
         return result
 
-    def articles(self, query={}, page=None, per_page=None):
+    def articles(self, query={}, page=None, per_page=None, project={"pageid": 1, "title": 1, "locale": 1, "first_extraction_date": 1, "last_extraction_date": 1, "last_revision_extracted": 1, "ns": 1}):
         query = QueryHandler(db=self.db).get_query(query)
         if "_id" in query:
             query["_id"] = ObjectId(query["_id"])
 
         if page==None or per_page==None:
-            articles= self.db.articles.find(query)
+            articles= self.db.articles.find(query, project)
         else:
-            articles= self.db.articles.find(query).skip((page-1)*per_page).limit(per_page)
+            articles= self.db.articles.find(query, project).skip((page-1)*per_page).limit(per_page)
 
         result=[]
         for rev in articles:
-            rev['first_extraction_date']= rev['first_extraction_date'].isoformat()
-            rev['last_extraction_date']= rev['last_extraction_date'].isoformat()
+            if rev != None and 'first_extraction_date' in rev:
+                rev['first_extraction_date']= rev['first_extraction_date'].isoformat()
+
+            if rev != None and 'last_extraction_date' in rev:
+                rev['last_extraction_date']= rev['last_extraction_date'].isoformat()
+
             result.append(rev)
 
         return result
 
-    def article(self,query={}):
-        art=self.db.articles.find_one(query)
-        if art != None:
+    def article(self,query={}, project={"pageid": 1, "title": 1, "locale": 1, "first_extraction_date": 1, "last_extraction_date": 1, "last_revision_extracted": 1, "ns": 1}):
+        art=self.db.articles.find_one(query, project)
+        if art != None and 'first_extraction_date' in art:
             art['first_extraction_date']= art['first_extraction_date'].isoformat()
 
-        if art != None:
+        if art != None and 'last_extraction_date' in art:
             art['last_extraction_date']= art['last_extraction_date'].isoformat()
         return art
 
