@@ -180,7 +180,14 @@ services:
     command: celery worker -A celery_worker.celery --loglevel=info
     environment:
       - FLASK_CONFIG=docker
-      - PYTHONBUFFERED=true
+      - MONGO_HOST=mongo
+      - MONGO_PORT=27017
+      - MONGO_USERNAME=wiki
+      - MONGO_PASSWORD=wiki123
+      - MONGO_DB_NAME=wiki_history_extractor
+      - MONGO_DB_TEST_NAME=wiki_history_extractor_test
+      - CELERY_BROKER_URL=amqp://wiki:wiki123@rabbit:5672
+      - CELERY_RESULT_BACKEND=amqp://wiki:wiki123@rabbit:5672
       - FLASK_DEBUG=1
     links:
       - rabbit
@@ -190,14 +197,14 @@ services:
       - mongo
     networks:
       - wiki_network
+    volumes:
+      - '.:/app'
 
   flower:
     hostname: flower
     image: wheapi
     restart: always
     command: flower -A celery_worker.celery --loglevel=info --broker=amqp://wiki:wiki123@rabbit:5672 --url_prefix=flower
-    ports:
-      - "5555:5555"
     links:
       - rabbit
     depends_on:
@@ -206,20 +213,19 @@ services:
       - wiki_network
 
   adminmongo:
+    restart: always
     hostname: adminmongo
-    image: mrvautin/adminmongo
+    image: mongo-express
     links:
       - mongo:mongo
+    depends_on:
+      - mongo
     environment:
-      - HOST=0.0.0.0
-      - CONN_NAME=wiki
-      - DB_USERNAME=wiki
-      - DB_PASSWORD=wiki123
-      - DB_HOST=mongo
-      - DB_PORT=27017
-      - DB_NAME=wiki_history_extractor
-      - PASSWORD=wiki123
-      - CONTEXT=adminmongo
+      - ME_CONFIG_MONGODB_SERVER=mongo
+      - ME_CONFIG_MONGODB_PORT=27017
+      - ME_CONFIG_BASICAUTH_USERNAME=wiki
+      - ME_CONFIG_BASICAUTH_PASSWORD=wiki123
+      - ME_CONFIG_SITE_BASEURL=/adminmongo
     volumes:
       - './docker/adminmongo/app.json:/app/user/config/app.json'
     networks:
