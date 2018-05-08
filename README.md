@@ -89,21 +89,25 @@ A custom API to extract and display wikipedia article revisions. Provide custom 
 
   * `sudo chmod +x /usr/local/bin/docker-compose`
 
-  * `cp docker-compose.development.yml docker-compose.yml`
+  * `cp docker-compose.production.yml docker-compose.yml`
 
   * `docker-compose build`
 
-  * `docker-compose up -d`
+  * `docker-compose up -d --scale flask=3 worker=3`
+    * `docker-compose up -d` for Development
 
-  * `./docker/mongo/create_user.sh`
-
-  * `docker-compose restart`
+  * `./docker/mongo/setup_nodes.sh`
+    * `./docker/mongo/create_user.sh` for development
 
   * Check the logs using `docker-compose logs`
 
-#### Docs
+#### Routes
 
-* `/api/v1/`
+* Documentation: `/api/v1/`
+* MongoDB web admin: `/adminmongo`
+* Flower Monitor: `/flower`
+
+User username `wiki` and password `wiki123`
 
 #### Extraction
 
@@ -113,7 +117,7 @@ A custom API to extract and display wikipedia article revisions. Provide custom 
 * example:
   * `/api/v1/extract?title=Malazan Book of the Fallen`
 
-### Monitoring
+### Monitoring (Without Docker)
 
 * Start Flower Monitor `./run.sh monitor`
 * Start Console Monitor `./run.sh events`
@@ -123,7 +127,7 @@ A custom API to extract and display wikipedia article revisions. Provide custom 
 * enter `crontab -e`
 * add line: `0 0 * * * (cd PATH/TO/PROJECT/ROOT/FOLDER/ && python -m app.cronjobs.revisit)`
 
-### Tests
+### Tests (Without Docker)
 
 1. `. bin/activate`
 1. `FLASK_CONFIG=testing`
