@@ -5,11 +5,8 @@ A custom API to extract and display wikipedia article revisions. Provide custom 
 ## Recommended Requirements
 
 * Python 2.7.10
-* Mongo DB 3.2.12
-* RabbitMQ 3.5.4
-* PyMongo 3.4.0 `pip install 'pymongo==3.4.0'`
-* Flower 0.9.1 `pip install 'flower==0.9.1'`
-* Celery 4.0.2 `pip install 'celery==4.0.2'`
+* MongoDB 3.4.7
+* PyMongo 3.4.0
 
 ## Development
 
