@@ -33,6 +33,26 @@ def revisions():
     - size
     - user
     - minor
+    - *
+
+    Project: Decide which columns to show
+    - comment
+    - anon
+    - pageid
+    - tags
+    - timestamp
+    - userid
+    - revid
+    - contentformat
+    - contentmodel
+    - extraction_date
+    - parentid
+    - title
+    - _id
+    - size
+    - user
+    - minor
+    - *
     """
 
     page = request.args.get('page', 1, int)

@@ -23,6 +23,14 @@ def articles():
     - last_extraction_date
     - last_revision_extracted
     - locale
+
+    Project: Decide which columns to show
+    - title
+    - ns
+    - first_extraction_date
+    - last_extraction_date
+    - last_revision_extracted
+    - locale
     '''
 
     page = request.args.get('page', 1, int)
@@ -43,7 +51,17 @@ def articles():
 @api.route('/articles/<page_id>',methods=['GET'])
 @auto.doc()
 def article(page_id):
-    '''Return the article for the given pageid.'''
+    '''
+    Return the article for the given pageid.
+
+    Project: Decide which columns to show
+    - title
+    - ns
+    - first_extraction_date
+    - last_extraction_date
+    - last_revision_extracted
+    - locale
+    '''
 
     project = project_params(request)
 
