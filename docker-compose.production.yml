@@ -205,8 +205,6 @@ services:
     image: wheapi
     restart: always
     command: flower -A celery_worker.celery --loglevel=info --broker=amqp://wiki:wiki123@rabbit:5672 --url_prefix=flower
-    ports:
-      - "5555:5555"
     links:
       - rabbit
     depends_on:
@@ -215,6 +213,7 @@ services:
       - wiki_network
 
   adminmongo:
+    restart: always
     hostname: adminmongo
     image: mongo-express
     links:
@@ -227,8 +226,6 @@ services:
       - ME_CONFIG_BASICAUTH_USERNAME=wiki
       - ME_CONFIG_BASICAUTH_PASSWORD=wiki123
       - ME_CONFIG_SITE_BASEURL=/adminmongo
-    ports:
-      - "8081:8081"
     volumes:
       - './docker/adminmongo/app.json:/app/user/config/app.json'
     networks:

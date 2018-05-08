@@ -215,6 +215,7 @@ services:
       - wiki_network
 
   adminmongo:
+    restart: always
     hostname: adminmongo
     image: mongo-express
     links:
