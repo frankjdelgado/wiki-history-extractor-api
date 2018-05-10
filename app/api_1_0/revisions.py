@@ -9,7 +9,8 @@ from config import config, Config
 @api.route('/revisions', methods=['GET'])
 @auto.doc()
 def revisions():
-    """Return list of article revisions
+    """
+    Return list of article revisions
 
     Pagination:
     - page: Page number. Defaults to 1. Example: ?page=2
@@ -17,42 +18,46 @@ def revisions():
     - sort: Sort by timestamps. Example: ?sort=asc or ?sort=desc
 
     Filters:
-    - comment
-    - anon
-    - pageid
-    - tags
-    - timestamp
-    - userid
-    - revid
-    - contentformat
-    - contentmodel
-    - extraction_date
-    - parentid
-    - title
-    - _id
-    - size
-    - user
-    - minor
-    - *
+    <ul class="params">
+        <li>comment</li>
+        <li>anon</li>
+        <li>pageid</li>
+        <li>tags</li>
+        <li>timestamp</li>
+        <li>userid</li>
+        <li>revid</li>
+        <li>contentformat</li>
+        <li>contentmodel</li>
+        <li>extraction_date</li>
+        <li>parentid</li>
+        <li>title</li>
+        <li>_id</li>
+        <li>size</li>
+        <li>user</li>
+        <li>minor</li>
+        <li>*</li>
+    </ul>
 
     Project: Decide which columns to show
-    - comment
-    - anon
-    - pageid
-    - tags
-    - timestamp
-    - userid
-    - revid
-    - contentformat
-    - contentmodel
-    - extraction_date
-    - parentid
-    - title
-    - _id
-    - size
-    - user
-    - minor
-    - *
+    <ul class="params">
+        <li>comment</li>
+        <li>anon</li>
+        <li>pageid</li>
+        <li>tags</li>
+        <li>timestamp</li>
+        <li>userid</li>
+        <li>revid</li>
+        <li>contentformat</li>
+        <li>contentmodel</li>
+        <li>extraction_date</li>
+        <li>parentid</li>
+        <li>title</li>
+        <li>_id</li>
+        <li>size</li>
+        <li>user</li>
+        <li>minor</li>
+        <li>*</li>
+    </ul>
     """
 
     page = request.args.get('page', 1, int)

@@ -9,29 +9,35 @@ from manage import auto
 @api.route('/articles', methods=['GET'])
 @auto.doc()
 def articles():
-    '''
+    """
     Return list of articles.
 
     Pagination:
-    - page: Page number. Defaults to 1. Example: ?page=2
-    - page_size: Number of items per page. Defaults to 20, max size of 200. Example: ?page=1&page_size=100
+    <ul class="params">
+        <li>page: Page number. Defaults to 1. <i>Example: <a href="articles?page=2" target="_blank">/api/v1/articles?page=2</a></i></li>
+        <li>page_size: Number of items per page. Defaults to 20, max size of 200. <i>Example: <a href="articles?page=1&page_size=100" target="_blank">/api/v1/articles?page=1&page_size=100</a></i></li>
+    </ul>
 
     Filters:
-    - title
-    - ns
-    - first_extraction_date
-    - last_extraction_date
-    - last_revision_extracted
-    - locale
+    <ul class="params">
+        <li>title</li>
+        <li>ns</li>
+        <li>first_extraction_date</li>
+        <li>last_extraction_date</li>
+        <li>last_revision_extracted</li>
+        <li>locale</li>
+    </ul>
 
     Project: Decide which columns to show
-    - title
-    - ns
-    - first_extraction_date
-    - last_extraction_date
-    - last_revision_extracted
-    - locale
-    '''
+    <ul class="params">
+        <li>title</li>
+        <li>ns</li>
+        <li>first_extraction_date</li>
+        <li>last_extraction_date</li>
+        <li>last_revision_extracted</li>
+        <li>locale</li>
+    </ul>
+    """
 
     page = request.args.get('page', 1, int)
     page_size = request.args.get('page_size', 20, int)
@@ -55,12 +61,14 @@ def article(page_id):
     Return the article for the given pageid.
 
     Project: Decide which columns to show
-    - title
-    - ns
-    - first_extraction_date
-    - last_extraction_date
-    - last_revision_extracted
-    - locale
+    <ul class="params">
+        <li>title</li>
+        <li>ns</li>
+        <li>first_extraction_date</li>
+        <li>last_extraction_date</li>
+        <li>last_revision_extracted</li>
+        <li>locale</li>
+    </ul>
     '''
 
     project = project_params(request)

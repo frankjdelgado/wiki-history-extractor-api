@@ -16,9 +16,7 @@ def extract():
 
     Params:
     <ul class="params">
-        <li>title: Article Title. <i>Example: RabbitMQ</i></li>
-        <li>url: Article URL. <i>Example: <a href="https://es.wikipedia.org/wiki/RabbitMQ" target="_blank">https://es.wikipedia.org/wiki/RabbitMQ</a></i></li>
-        <li>locale: Article Language <i>(Optional)</i>. <i>Example: en<i/></li>
+        <li>title: Article Title. <i>Example: RabbitMQ</i></li><li>url: Article URL. <i>Example: <a href="https://es.wikipedia.org/wiki/RabbitMQ" target="_blank">https://es.wikipedia.org/wiki/RabbitMQ</a></i></li><li>locale: Article Language <i>(Optional)</i>. <i>Example: en</i></li>
     </ul>
     '''
     pageid = request.args.get('pageid')

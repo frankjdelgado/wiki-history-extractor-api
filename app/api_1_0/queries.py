@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify, Response, url_for
 import urlparse
 from bson import json_util
-from .errors import bad_request 
+from .errors import bad_request
 from . import api,articles
 from .utils import filter_params, mode_param
 from app.tasks.app_tasks import count_task, avg_task, mode_task
@@ -30,10 +30,10 @@ def conditions_query(arguments):
 def mapreduce():
     '''
     Use a json payload to query map reduce results
-    
+
     - collection. Collection name
     - map. map function code.
-    - reduce. reduce function code. 
+    - reduce. reduce function code.
     '''
 
     collection = request.args.get('collection', 'revisions')
@@ -46,7 +46,7 @@ def mapreduce():
     out = json_util.dumps({'out':'map_reduce'})
 
     result = db.mapreduce(out, collection, map_code, reduce_code, full_response, query)
-    
+
     return Response(
         json_util.dumps(result.find()),
         mimetype='application/json'
@@ -57,27 +57,14 @@ def mapreduce():
 def query():
     '''
     Use a json payload to query the collections using the mongoDB aggregate function
-    
+
     Params:
     - collection. Collection name. Defaults to 'revisions'. Example: ?collection=articles
     - date_format. Column date format. Defaults to %Y-%m-%dT%H:%M:%S. Example: ?date_Format=%Y-%m-%dT%H:%M:%S
-        
-    Json Payload Example:
-    [
-        { 
-            "$match": { 
-                "extraction_date": "2017-09-28T02:36:33.452000",
-                "pageid": 4606
-            }
-        },
-        { 
-            "$project" :{ 
-                "pageid": 1 , "timestamp" : 1
-            } 
-            
-        },
-       { "$limit" : 5 }
-    ]
+
+    Example:
+    URL: <a href="/api/v1/query?collection=revisions">/api/v1/query?collection=revisions</a>
+    Payload: [{"$match": { "pageid": 630354 } }, { "$project" :{ "pageid": 1 , "revid" : 1 } }, { "$limit" : 5 } ]
     '''
 
     collection = request.args.get('collection', 'revisions')
@@ -85,7 +72,7 @@ def query():
     db = RevisionDB(config={'host': config['default'].MONGO_HOST, 'port': config['default'].MONGO_PORT, 'username': config['default'].MONGO_USERNAME, 'password': config['default'].MONGO_PASSWORD, 'db_name':config['default'].MONGO_DB_NAME})
 
     pipeline = request.get_json(silent=True)
-    
+
     result = db.aggregate(collection, pipeline, date_format)
     return Response(
         json_util.dumps(result),
@@ -98,7 +85,7 @@ def query():
 def count():
     '''Execute the count query
 
-    Returns the amount of revisions which match the criteria. 
+    Returns the amount of revisions which match the criteria.
 
     The function can receive several parameters to filtering the results:
     -title: the name of the wiki article of the revisions.
@@ -135,23 +122,23 @@ def avg():
     Returns the average of revisions which match the criteria between 2 dates.
 
     The function can receive one or more criteria to filtering the results, besides the dates of the interval:
-    -title: the name of the wiki article of the revisions. 
+    -title: the name of the wiki article of the revisions.
     -pageid: the id of the wiki article of the revisions.
-    -user: the name of the Author of the revisions. 
+    -user: the name of the Author of the revisions.
     -userid: the id of the Author of the revisions.
-    -tag: a given tag of the revision. 
-    -size: the size of the revision. 
-    -sizematch: Used with size filtering, to match the revisions greater, lesser or exact size as given. 
+    -tag: a given tag of the revision.
+    -size: the size of the revision.
+    -sizematch: Used with size filtering, to match the revisions greater, lesser or exact size as given.
 
-    An explicit date interval is necessary for the query: (Dates will be in format YYYY-MM-DD) 
-    -datestart: initial date of the interval from which will match the revisions. 
+    An explicit date interval is necessary for the query: (Dates will be in format YYYY-MM-DD)
+    -datestart: initial date of the interval from which will match the revisions.
     -dateend: final date of the interval until which will match the revisions.
     '''
 
     arguments=filter_params(request)
     error_message=conditions_query(arguments)
     if error_message != None:
-        return bad_request(error_message)   
+        return bad_request(error_message)
 
     if not ('datestart' in request.args and 'dateend' in request.args):
         return bad_request("The query must have 'datestart' and 'dateend' arguments, please check the query.")
@@ -168,7 +155,7 @@ def avg():
 def mode():
     '''Execute the mode query
 
-    Returns the value or values of most repetitions from the revisions, given an attribute. 
+    Returns the value or values of most repetitions from the revisions, given an attribute.
 
     The function receive ONE CRITERIA as mode attribute, using the 'attribute' argument, which will contain an argument's name, among the valid arguments there are:
     -title: the name of the wiki article with most revisions.
@@ -201,4 +188,3 @@ def mode():
         return jsonify({mode_attribute:result['result']}), 200
     else:
         return bad_request("There was an error with the arguments, please check the query.")
-
