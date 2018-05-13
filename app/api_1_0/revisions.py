@@ -13,10 +13,12 @@ def revisions():
     Return list of article revisions
 
     Pagination:
-    - page: Page number. Defaults to 1. Example: ?page=2
-    - page_size: Number of items per page. Defaults to 20, max size of 200. Example: ?page=1&page_size=100
-    - sort: Sort by timestamps. Example: ?sort=asc or ?sort=desc
-
+    <ul class="params">
+        <li>page: Page number. Defaults to 1.</li>
+        <li>page_size: Number of items per page. Defaults to 20, max size of 200.</li>
+        <li>sort: Sort by timestamps. Example: ?sort=asc or ?sort=desc</li>
+        <i>Example: <a href="revisions?title=RabbitMQ&page=1&page_size=5&sort=desc" target="_blank">/api/v1/revisions?page=1&page_size=5&sort=desc</a></i>
+    </ul>
     Filters:
     <ul class="params">
         <li>comment</li>
@@ -36,8 +38,8 @@ def revisions():
         <li>user</li>
         <li>minor</li>
         <li>*</li>
+        <i>Example: <a href="revisions?title=RabbitMQ" target="_blank">/api/v1/revisions?title=RabbitMQ&page=1&page_size=5&sort=desc</a></i>
     </ul>
-
     Project: Decide which columns to show
     <ul class="params">
         <li>comment</li>
@@ -57,7 +59,9 @@ def revisions():
         <li>user</li>
         <li>minor</li>
         <li>*</li>
+        <i>Example: <a href="revisions?title=RabbitMQ&project=title,revid,timestamp&page=1&page_size=5&sort=desc" target="_blank">/api/v1/revisions?title=RabbitMQ&project=title,revid,timestamp&page=1&page_size=5&sort=desc</a></i>
     </ul>
+
     """
 
     page = request.args.get('page', 1, int)

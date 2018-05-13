@@ -14,10 +14,10 @@ def articles():
 
     Pagination:
     <ul class="params">
-        <li>page: Page number. Defaults to 1. <i>Example: <a href="articles?page=2" target="_blank">/api/v1/articles?page=2</a></i></li>
-        <li>page_size: Number of items per page. Defaults to 20, max size of 200. <i>Example: <a href="articles?page=1&page_size=100" target="_blank">/api/v1/articles?page=1&page_size=100</a></i></li>
+        <li>page: Page number. Defaults to 1.</li>
+        <li>page_size: Number of items per page. Defaults to 20, max size of 200.</li>
+        <i>Example: <a href="articles?page=1&page_size=100" target="_blank">/api/v1/articles?page=1&page_size=100</a></i>
     </ul>
-
     Filters:
     <ul class="params">
         <li>title</li>
@@ -26,8 +26,8 @@ def articles():
         <li>last_extraction_date</li>
         <li>last_revision_extracted</li>
         <li>locale</li>
+        <i>Example: <a href="articles?title=RabbitMQ" target="_blank">/api/v1/articles?title=RabbitMQ</a></i>
     </ul>
-
     Project: Decide which columns to show
     <ul class="params">
         <li>title</li>
@@ -36,6 +36,7 @@ def articles():
         <li>last_extraction_date</li>
         <li>last_revision_extracted</li>
         <li>locale</li>
+        <i>Example: <a href="articles?title=RabbitMQ&project=pageid,title" target="_blank">/api/v1/articles?title=RabbitMQ&project=pageid,title</a></i>
     </ul>
     """
 
@@ -68,6 +69,7 @@ def article(page_id):
         <li>last_extraction_date</li>
         <li>last_revision_extracted</li>
         <li>locale</li>
+        <i>Example: <a href="articles/3787053?project=pageid,title,locale" target="_blank">/api/v1/articles/3787053?project=pageid,title,locale</a></i>
     </ul>
     '''
 

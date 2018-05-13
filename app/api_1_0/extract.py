@@ -12,12 +12,15 @@ def extract():
     '''
     Extract the revisions data from a wiki article. The function can receive the URL or the wiki title.
 
-    Example: <a href="extract?title=RabbitMQ&locale=es" target="_blank">/api/v1/extract?title=RabbitMQ&locale=es</a>
-
     Params:
     <ul class="params">
-        <li>title: Article Title. <i>Example: RabbitMQ</i></li><li>url: Article URL. <i>Example: <a href="https://es.wikipedia.org/wiki/RabbitMQ" target="_blank">https://es.wikipedia.org/wiki/RabbitMQ</a></i></li><li>locale: Article Language <i>(Optional)</i>. <i>Example: en</i></li>
+        <li>title: Article Title. <i>Example: RabbitMQ</i></li><li>url: Article URL.
+        <li>locale: Article Language <i>(Optional)</i>.</li>
     </ul>
+    Examples:
+    <a href="extract?title=RabbitMQ&locale=es" target="_blank">/api/v1/extract?title=RabbitMQ&locale=es</a>
+
+    <a href="extract?url=https://es.wikipedia.org/wiki/RabbitMQ" target="_blank">/api/v1/extract?url=https://es.wikipedia.org/wiki/RabbitMQ</a>
     '''
     pageid = request.args.get('pageid')
     locale = request.args.get('locale','en')

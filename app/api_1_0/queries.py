@@ -25,15 +25,19 @@ def conditions_query(arguments):
     return None
 
 
-@api.route('/mapreduce', methods=['POST'])
+@api.route('/mapreduce', methods=['POST','GET'])
 @auto.doc()
 def mapreduce():
     '''
     Use a json payload to query map reduce results
 
-    - collection. Collection name
-    - map. map function code.
-    - reduce. reduce function code.
+    Params:
+    <ul class="params">
+        <li>collection.Required. Collection name</li>
+        <li>map. Required. map function code</li>
+        <li>reduce. Required. reduce function code</li>
+    </ul>
+    <i>Example: <a href="mapreduce?map=function(){emit(this.user,this.size);}&reduce=function(user_id,values_sizes){return Array.sum(values_sizes);}&collection=revisions" target="_blank">api/v1/mapreduce?map=function(){emit(this.user,this.size);}&reduce=function(user_id,values_sizes){ return Array.sum(values_sizes);}&collection=revisions</a></i>
     '''
 
     collection = request.args.get('collection', 'revisions')
@@ -59,12 +63,13 @@ def query():
     Use a json payload to query the collections using the mongoDB aggregate function
 
     Params:
-    - collection. Collection name. Defaults to 'revisions'. Example: ?collection=articles
-    - date_format. Column date format. Defaults to %Y-%m-%dT%H:%M:%S. Example: ?date_Format=%Y-%m-%dT%H:%M:%S
-
-    Example:
-    URL: <a href="/api/v1/query?collection=revisions">/api/v1/query?collection=revisions</a>
-    Payload: [{"$match": { "pageid": 630354 } }, { "$project" :{ "pageid": 1 , "revid" : 1 } }, { "$limit" : 5 } ]
+    <ul class="params">
+        <li>collection. Collection name. Defaults to 'revisions'</li>
+        <li>date_format. Column date format. Defaults to %Y-%m-%dT%H:%M:%S</li>
+        Example:
+        URL: <a href="/api/v1/query?collection=revisions">/api/v1/query?collection=revisions</a>
+        Payload: [{"$match": { "pageid": 630354 } }, { "$project" :{ "pageid": 1 , "revid" : 1 } }, { "$limit" : 5 } ]
+    </ul>
     '''
 
     collection = request.args.get('collection', 'revisions')
@@ -83,22 +88,23 @@ def query():
 @api.route('/count', methods=['GET'])
 @auto.doc()
 def count():
-    '''Execute the count query
+    '''
+    Returns the amount of revisions that match the criteria.
 
-    Returns the amount of revisions which match the criteria.
-
-    The function can receive several parameters to filtering the results:
-    -title: the name of the wiki article of the revisions.
-    -pageid: the id of the wiki article of the revisions.
-    -user: the name of the Author of the revisions.
-    -userid: the id of the Author of the revisions.
-    -tag: a given tag of the revision.
-    -size: the size of the revision.
-    -sizematch: Used with size filtering, to match the revisions greater , lesser or exact size as given.
-    -date: a given date for match revisions made that date.
-    -datestart: date from which will match the revisions. If there is not dateend as arg, dateend would be consider the current date.
-    -dateend: date until which will match the revisions. If there is not datestart as arg, datestart would be consider the date of the first revision entered.
-    (Note: Dates will be displayed in format YYYY-MM-DD)
+    Filters:
+    <ul class="params">
+        <li>title. The name of the wiki article of the revisions</li>
+        <li>pageid. The id of the wiki article of the revisions</li>
+        <li>user. The name of the Author of the revisions</li>
+        <li>userid. The id of the Author of the revisions</li>
+        <li>tag. A given tag of the revision</li>
+        <li>size. The size of the revision</li>
+        <li>sizematch. Used with size filtering to match revisions greater, lesser or with the exact size as given</li>
+        <li>date. A given date for match revisions made that date</li>
+        <li>datestart. Format: YYYY-MM-DD. Date from which will match the revisions If there is not dateend as arg, dateend would be consider the current date</li>
+        <li>dateend. Format: YYYY-MM-DD. Date until which will match the revisions. If there is not datestart as arg, datestart would be consider the date of the first revision entered</li>
+        <i>Example: <a href="count?datestart=2010-05-01&dateend=2010-06-01" target="_blank">/api/v1/count?datestart=2010-05-01&dateend=2010-06-01</a></i>
+    </ul>
     '''
 
     arguments=filter_params(request)
@@ -119,20 +125,21 @@ def count():
 def avg():
     '''Execute the average query
 
-    Returns the average of revisions which match the criteria between 2 dates.
+    Returns the average of revisions created between 2 dates.
 
-    The function can receive one or more criteria to filtering the results, besides the dates of the interval:
-    -title: the name of the wiki article of the revisions.
-    -pageid: the id of the wiki article of the revisions.
-    -user: the name of the Author of the revisions.
-    -userid: the id of the Author of the revisions.
-    -tag: a given tag of the revision.
-    -size: the size of the revision.
-    -sizematch: Used with size filtering, to match the revisions greater, lesser or exact size as given.
-
-    An explicit date interval is necessary for the query: (Dates will be in format YYYY-MM-DD)
-    -datestart: initial date of the interval from which will match the revisions.
-    -dateend: final date of the interval until which will match the revisions.
+    Filters:
+    <ul class="params">
+        <li>title. The name of the wiki article of the revisions</li>
+        <li>pageid. The id of the wiki article of the revisions</li>
+        <li>user. The name of the Author of the revisions</li>
+        <li>userid. The id of the Author of the revisions</li>
+        <li>tag. A given tag of the revision</li>
+        <li>size. The size of the revision</li>
+        <li>sizematch: Used with size filtering, to match the revisions greater, lesser or exact size as given</li>
+        <li><strong>datestart. Required.</strong> Initial date of the interval from which will match the revisions. Date format: YYYY-MM-DD</li>
+        <li><strong>dateend. Required.</strong> Final date of the interval until which will match the revisions. Date format: YYYY-MM-DD</li>
+        <i>Example: <a href="avg?datestart=2010-05-01&dateend=2010-06-01" target="_blank">/api/v1/avg?datestart=2010-05-01&dateend=2010-06-01</a></i>
+    </ul>
     '''
 
     arguments=filter_params(request)
@@ -153,22 +160,36 @@ def avg():
 @api.route('/mode', methods=['GET'])
 @auto.doc()
 def mode():
-    '''Execute the mode query
-
+    '''
     Returns the value or values of most repetitions from the revisions, given an attribute.
 
-    The function receive ONE CRITERIA as mode attribute, using the 'attribute' argument, which will contain an argument's name, among the valid arguments there are:
-    -title: the name of the wiki article with most revisions.
-    -pageid: the id of the wiki article with most revisions.
-    -user: the name of the Author(s) which wrote most revisions.
-    -userid: the id of the Author(s) which wrote most revisions.
-    -size: the size of revision(s) most repeated.
-    -date: the date on which most revisions were written.
-    For now, mode for tag criteria is disabled, due to lack of tags in revisions.
-
-    The function can also receive filtering arguments to limit the range, as with count function.
-    It is recommended be specially careful about filtering the range of the revisions.
-    For instance, avoid use unique date filter when using date as mode attribute, because it will return as best scenario the same date(in that case it is better to use a date interval)
+    Params:
+    <ul class="params">
+        <li><strong>attribute. Required.</strong> Collection attribute to analize</li>
+        Values:
+        <ul class="params">
+            <li>title. The name of the wiki article with most revisions</li>
+            <li>pageid. The id of the wiki article with most revisions</li>
+            <li>user. The name of the Author(s) which wrote most revisions</li>
+            <li>userid. The id of the Author(s) which wrote most revisions</li>
+            <li>size. The size of revision(s) most repeated</li>
+            <li>date. The date on which most revisions were written</li>
+        </ul>
+        Filters. <strong>At least one attribute most be specified</strong>:
+        <ul class="params">
+            <li>title</li>
+            <li>pageid</li>
+            <li>user</li>
+            <li>userid</li>
+            <li>size</li>
+            <li>sizematch</li>
+            <li>date</li>
+            <li>datestart</li>
+            <li>dateend</li>
+            <i>Avoid use unique date filter when using date as mode attribute, because it will return as best scenario the same date(in that case it is better to use a date interval)</i>
+        </ul>
+    </ul>
+    <i>Example: <a href="mode?datestart=2010-01-01&attribute=user" target="_blank">/api/v1/mode?datestart=2010-01-01&attribute=user</a></i>
     '''
     arguments=filter_params(request)
     error_message=conditions_query(arguments)
