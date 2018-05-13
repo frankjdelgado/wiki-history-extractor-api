@@ -62,18 +62,22 @@ A custom API to extract and display wikipedia article revisions. Provide custom 
 
   * `sudo apt-get update`
 
-  * `sudo apt-get install \
+  * ```
+    sudo apt-get install \
     apt-transport-https \
     ca-certificates \
     curl \
-    software-properties-common`
+    software-properties-common
+    ```
 
   * `curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -`
 
-  * `sudo add-apt-repository \
+  * ```
+    sudo add-apt-repository \
         "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
         $(lsb_release -cs) \
-        stable"`
+        stable"
+    ```
 
   * `sudo apt-get update`
 
@@ -85,19 +89,28 @@ A custom API to extract and display wikipedia article revisions. Provide custom 
 
   * `sudo -i`
 
-  * ```sudo curl -L https://github.com/docker/compose/releases/download/1.21.0/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose```
+  * `sudo curl -L https://github.com/docker/compose/releases/download/1.21.0/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
+  `
 
   * `sudo chmod +x /usr/local/bin/docker-compose`
+
+* Setup Docker Containers and Images
 
   * `cp docker-compose.production.yml docker-compose.yml`
 
   * `docker-compose build`
 
-  * `docker-compose up -d --scale flask=3 worker=3`
+  * Cluster:
+
+    * `docker-compose up -d --scale flask=3 worker=3`
+
+    * `./docker/mongo/setup_nodes.sh`
+
+  * Single Node:
+
     * `docker-compose up -d` for Development
 
-  * `./docker/mongo/setup_nodes.sh`
-    * `./docker/mongo/create_user.sh` for development
+    * `./docker/mongo/create_user.sh`
 
   * Check the logs using `docker-compose logs`
 
@@ -109,26 +122,19 @@ A custom API to extract and display wikipedia article revisions. Provide custom 
 
 User username `wiki` and password `wiki123`
 
-#### Extraction
+### Tests
 
-* URL: `/api/v1/extract`
-* params:
-  * `title`: Wikipedia article title
-* example:
-  * `/api/v1/extract?title=Malazan Book of the Fallen`
+* Without Docker
 
-### Monitoring (Without Docker)
+  1. `. bin/activate`
 
-* Start Flower Monitor `./run.sh monitor`
-* Start Console Monitor `./run.sh events`
+  1. `FLASK_CONFIG=testing`
+
+  1. `python -m app.tests.test_api`
+
+* Docker: `./docker/tests/run.sh`
 
 ### Cronjobs
 
 * enter `crontab -e`
 * add line: `0 0 * * * (cd PATH/TO/PROJECT/ROOT/FOLDER/ && python -m app.cronjobs.revisit)`
-
-### Tests (Without Docker)
-
-1. `. bin/activate`
-1. `FLASK_CONFIG=testing`
-1. `python -m app.tests.test_api`
