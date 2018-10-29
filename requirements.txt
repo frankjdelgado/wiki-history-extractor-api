@@ -1,4 +1,4 @@
-Flask==0.12
+Flask==0.12.3
 Flask_Script==2.0.5
 pymongo==3.4.0
 requests==2.20.0
