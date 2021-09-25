@@ -3,7 +3,7 @@ Flask_Script==2.0.5
 pymongo==3.4.0
 requests==2.20.0
 Flask_Autodoc==0.1.2
-celery==4.0.2
+celery==4.2.0
 Werkzeug==0.12.1
 w3lib==1.18.0
 coverage==4.4.1
